@@ -1,0 +1,452 @@
+[
+{
+"id": "iphone-8",
+"name": "iPhone 8",
+"year": 2017,
+"colors": [
+"dourado",
+"prateado",
+"cinza-espacial",
+"red"
+]
+},
+{
+"id": "iphone-8-plus",
+"name": "iPhone 8 Plus",
+"year": 2017,
+"colors": [
+"dourado",
+"prateado",
+"cinza-espacial",
+"red"
+]
+},
+{
+"id": "iphone-x",
+"name": "iPhone X",
+"year": 2017,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "iphone-xs",
+"name": "iPhone XS",
+"year": 2018,
+"colors": [
+"dourado",
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "iphone-xs-max",
+"name": "iPhone XS Max",
+"year": 2018,
+"colors": [
+"dourado",
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "iphone-xr",
+"name": "iPhone XR",
+"year": 2018,
+"colors": [
+"preto",
+"branco",
+"azul",
+"amarelo",
+"coral",
+"red"
+]
+},
+{
+"id": "iphone-11",
+"name": "iPhone 11",
+"year": 2019,
+"colors": [
+"preto",
+"verde",
+"amarelo",
+"roxo",
+"red",
+"branco"
+]
+},
+{
+"id": "iphone-11-pro",
+"name": "iPhone 11 Pro",
+"year": 2019,
+"colors": [
+"verde-meia-noite",
+"cinza-espacial",
+"prateado",
+"dourado"
+]
+},
+{
+"id": "iphone-11-pro-max",
+"name": "iPhone 11 Pro Max",
+"year": 2019,
+"colors": [
+"verde-meia-noite",
+"cinza-espacial",
+"prateado",
+"dourado"
+]
+},
+{
+"id": "iphone-se-2",
+"name": "iPhone SE (2ª geração)",
+"year": 2020,
+"colors": [
+"preto",
+"branco",
+"red"
+]
+},
+{
+"id": "iphone-12-mini",
+"name": "iPhone 12 mini",
+"year": 2020,
+"colors": [
+"preto",
+"branco",
+"red",
+"verde",
+"azul",
+"roxo"
+]
+},
+{
+"id": "iphone-12",
+"name": "iPhone 12",
+"year": 2020,
+"colors": [
+"preto",
+"branco",
+"red",
+"verde",
+"azul",
+"roxo"
+]
+},
+{
+"id": "iphone-12-pro",
+"name": "iPhone 12 Pro",
+"year": 2020,
+"colors": [
+"grafite",
+"prateado",
+"dourado",
+"azul-pacifico"
+]
+},
+{
+"id": "iphone-12-pro-max",
+"name": "iPhone 12 Pro Max",
+"year": 2020,
+"colors": [
+"grafite",
+"prateado",
+"dourado",
+"azul-pacifico"
+]
+},
+{
+"id": "iphone-13-mini",
+"name": "iPhone 13 mini",
+"year": 2021,
+"colors": [
+"estelar",
+"meia-noite",
+"azul",
+"rosa",
+"red",
+"verde"
+]
+},
+{
+"id": "iphone-13",
+"name": "iPhone 13",
+"year": 2021,
+"colors": [
+"estelar",
+"meia-noite",
+"azul",
+"rosa",
+"red",
+"verde"
+]
+},
+{
+"id": "iphone-13-pro",
+"name": "iPhone 13 Pro",
+"year": 2021,
+"colors": [
+"grafite",
+"dourado",
+"prateado",
+"azul-sierra",
+"verde-alpino"
+]
+},
+{
+"id": "iphone-13-pro-max",
+"name": "iPhone 13 Pro Max",
+"year": 2021,
+"colors": [
+"grafite",
+"dourado",
+"prateado",
+"azul-sierra",
+"verde-alpino"
+]
+},
+{
+"id": "iphone-se-3",
+"name": "iPhone SE (3ª geração)",
+"year": 2022,
+"colors": [
+"meia-noite",
+"estelar",
+"red"
+]
+},
+{
+"id": "iphone-14",
+"name": "iPhone 14",
+"year": 2022,
+"colors": [
+"meia-noite",
+"estelar",
+"azul",
+"roxo",
+"red",
+"amarelo"
+]
+},
+{
+"id": "iphone-14-plus",
+"name": "iPhone 14 Plus",
+"year": 2022,
+"colors": [
+"meia-noite",
+"estelar",
+"azul",
+"roxo",
+"red",
+"amarelo"
+]
+},
+{
+"id": "iphone-14-pro",
+"name": "iPhone 14 Pro",
+"year": 2022,
+"colors": [
+"preto-espacial",
+"prateado",
+"dourado",
+"roxo-profundo"
+]
+},
+{
+"id": "iphone-14-pro-max",
+"name": "iPhone 14 Pro Max",
+"year": 2022,
+"colors": [
+"preto-espacial",
+"prateado",
+"dourado",
+"roxo-profundo"
+]
+},
+{
+"id": "iphone-15",
+"name": "iPhone 15",
+"year": 2023,
+"colors": [
+"preto",
+"azul",
+"verde",
+"amarelo",
+"rosa"
+]
+},
+{
+"id": "iphone-15-plus",
+"name": "iPhone 15 Plus",
+"year": 2023,
+"colors": [
+"preto",
+"azul",
+"verde",
+"amarelo",
+"rosa"
+]
+},
+{
+"id": "iphone-15-pro",
+"name": "iPhone 15 Pro",
+"year": 2023,
+"colors": [
+"titanio-preto",
+"titanio-branco",
+"titanio-azul",
+"titanio-natural"
+]
+},
+{
+"id": "iphone-15-pro-max",
+"name": "iPhone 15 Pro Max",
+"year": 2023,
+"colors": [
+"titanio-preto",
+"titanio-branco",
+"titanio-azul",
+"titanio-natural"
+]
+},
+{
+"id": "iphone-16",
+"name": "iPhone 16",
+"year": 2024,
+"colors": [
+"preto",
+"branco",
+"rosa",
+"verde-acinzentado",
+"ultramarino"
+]
+},
+{
+"id": "iphone-16-plus",
+"name": "iPhone 16 Plus",
+"year": 2024,
+"colors": [
+"preto",
+"branco",
+"rosa",
+"verde-acinzentado",
+"ultramarino"
+]
+},
+{
+"id": "iphone-16-pro",
+"name": "iPhone 16 Pro",
+"year": 2024,
+"colors": [
+"titanio-preto",
+"titanio-branco",
+"titanio-natural",
+"titanio-deserto"
+]
+},
+{
+"id": "iphone-16-pro-max",
+"name": "iPhone 16 Pro Max",
+"year": 2024,
+"colors": [
+"titanio-preto",
+"titanio-branco",
+"titanio-natural",
+"titanio-deserto"
+]
+},
+{
+"id": "iphone-16e",
+"name": "iPhone 16e",
+"year": 2025,
+"colors": [
+"preto",
+"branco"
+]
+},
+{
+"id": "iphone-17",
+"name": "iPhone 17",
+"year": 2025,
+"colors": [
+"preto",
+"branco",
+"azul-nevoa",
+"salvia",
+"lavanda"
+]
+},
+{
+"id": "iphone-air",
+"name": "iPhone Air",
+"year": 2025,
+"colors": [
+"preto-espacial",
+"branco-nuvem",
+"dourado-claro",
+"azul-ceu"
+]
+},
+{
+"id": "iphone-17-pro",
+"name": "iPhone 17 Pro",
+"year": 2025,
+"colors": [
+"prateado",
+"laranja-cosmico",
+"azul-profundo"
+]
+},
+{
+"id": "iphone-17-pro-max",
+"name": "iPhone 17 Pro Max",
+"year": 2025,
+"colors": [
+"prateado",
+"laranja-cosmico",
+"azul-profundo"
+]
+},
+{
+"id": "iphone-17e",
+"name": "iPhone 17e",
+"year": 2026,
+"colors": [
+"preto",
+"branco",
+"rosa-palido"
+]
+},
+{
+"id": "iphone-18-pro",
+"name": "iPhone 18 Pro",
+"year": 2026,
+"colors": [
+"preto",
+"prateado",
+"glacial",
+"bordo"
+]
+},
+{
+"id": "iphone-18-pro-max",
+"name": "iPhone 18 Pro Max",
+"year": 2026,
+"colors": [
+"preto",
+"prateado",
+"glacial",
+"bordo"
+]
+},
+{
+"id": "iphone-duo",
+"name": "iPhone Duo",
+"year": 2026,
+"colors": [
+"ceu-noturno",
+"branco-estrela"
+]
+}
+]

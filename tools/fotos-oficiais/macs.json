@@ -1,0 +1,465 @@
+[
+{
+"id": "mba-11-2015",
+"name": "MacBook Air 11\" (2015)",
+"year": 2015,
+"colors": [
+"prateado"
+]
+},
+{
+"id": "mba-13-2015",
+"name": "MacBook Air 13\" (2015)",
+"year": 2015,
+"colors": [
+"prateado"
+]
+},
+{
+"id": "mba-13-2017",
+"name": "MacBook Air 13\" (2017)",
+"year": 2017,
+"colors": [
+"prateado"
+]
+},
+{
+"id": "mb-12-2015",
+"name": "MacBook 12\" (2015)",
+"year": 2015,
+"colors": [
+"prateado",
+"cinza-espacial",
+"dourado"
+]
+},
+{
+"id": "mb-12-2016",
+"name": "MacBook 12\" (2016)",
+"year": 2016,
+"colors": [
+"prateado",
+"cinza-espacial",
+"dourado",
+"ouro-rosa"
+]
+},
+{
+"id": "mb-12-2017",
+"name": "MacBook 12\" (2017)",
+"year": 2017,
+"colors": [
+"prateado",
+"cinza-espacial",
+"dourado",
+"ouro-rosa"
+]
+},
+{
+"id": "mbp-13-2015",
+"name": "MacBook Pro 13\" Retina (2015)",
+"year": 2015,
+"colors": [
+"prateado"
+]
+},
+{
+"id": "mbp-15-2015",
+"name": "MacBook Pro 15\" Retina (2015)",
+"year": 2015,
+"colors": [
+"prateado"
+]
+},
+{
+"id": "mbp-13-2016-2p",
+"name": "MacBook Pro 13\" 2016 · 2 portas (sem Touch Bar)",
+"year": 2016,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-13-2016",
+"name": "MacBook Pro 13\" 2016 · Touch Bar (4 portas)",
+"year": 2016,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-15-2016",
+"name": "MacBook Pro 15\" 2016 · Touch Bar",
+"year": 2016,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-13-2017-2p",
+"name": "MacBook Pro 13\" 2017 · 2 portas (sem Touch Bar)",
+"year": 2017,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-13-2017",
+"name": "MacBook Pro 13\" 2017 · Touch Bar (4 portas)",
+"year": 2017,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-15-2017",
+"name": "MacBook Pro 15\" 2017 · Touch Bar",
+"year": 2017,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-13-2018",
+"name": "MacBook Pro 13\" 2018 · Touch Bar (4 portas)",
+"year": 2018,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-15-2018",
+"name": "MacBook Pro 15\" 2018 · Touch Bar",
+"year": 2018,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mba-13-2018",
+"name": "MacBook Air 13\" Retina (2018)",
+"year": 2018,
+"colors": [
+"prateado",
+"cinza-espacial",
+"dourado"
+]
+},
+{
+"id": "mbp-13-2019-2p",
+"name": "MacBook Pro 13\" 2019 · Touch Bar (2 portas)",
+"year": 2019,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-13-2019",
+"name": "MacBook Pro 13\" 2019 · Touch Bar (4 portas)",
+"year": 2019,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-15-2019",
+"name": "MacBook Pro 15\" 2019 · Touch Bar",
+"year": 2019,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mba-13-2019",
+"name": "MacBook Air 13\" Retina (2019)",
+"year": 2019,
+"colors": [
+"prateado",
+"cinza-espacial",
+"dourado"
+]
+},
+{
+"id": "mbp-16-2019",
+"name": "MacBook Pro 16\" 2019 · Touch Bar",
+"year": 2019,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-13-2020-2p",
+"name": "MacBook Pro 13\" 2020 · Touch Bar (2 portas, Intel)",
+"year": 2020,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-13-2020",
+"name": "MacBook Pro 13\" 2020 · Touch Bar (4 portas, Intel)",
+"year": 2020,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mba-13-2020",
+"name": "MacBook Air 13\" Retina (2020, Intel)",
+"year": 2020,
+"colors": [
+"prateado",
+"cinza-espacial",
+"dourado"
+]
+},
+{
+"id": "mba-m1",
+"name": "MacBook Air 13\" M1 (2020)",
+"year": 2020,
+"colors": [
+"prateado",
+"cinza-espacial",
+"dourado"
+]
+},
+{
+"id": "mbp-13-m1",
+"name": "MacBook Pro 13\" M1 (2020) · Touch Bar",
+"year": 2020,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-14-2021",
+"name": "MacBook Pro 14\" M1 Pro/Max (2021)",
+"year": 2021,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-16-2021",
+"name": "MacBook Pro 16\" M1 Pro/Max (2021)",
+"year": 2021,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mba-13-m2",
+"name": "MacBook Air 13\" M2 (2022)",
+"year": 2022,
+"colors": [
+"meia-noite",
+"estelar",
+"cinza-espacial",
+"prateado"
+]
+},
+{
+"id": "mbp-13-m2",
+"name": "MacBook Pro 13\" M2 (2022) · Touch Bar",
+"year": 2022,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-14-2023",
+"name": "MacBook Pro 14\" M2 Pro/Max (2023)",
+"year": 2023,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-16-2023",
+"name": "MacBook Pro 16\" M2 Pro/Max (2023)",
+"year": 2023,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mba-15-m2",
+"name": "MacBook Air 15\" M2 (2023)",
+"year": 2023,
+"colors": [
+"meia-noite",
+"estelar",
+"cinza-espacial",
+"prateado"
+]
+},
+{
+"id": "mbp-14-m3",
+"name": "MacBook Pro 14\" M3 (2023)",
+"year": 2023,
+"colors": [
+"prateado",
+"cinza-espacial"
+]
+},
+{
+"id": "mbp-14-m3pro",
+"name": "MacBook Pro 14\" M3 Pro/Max (2023)",
+"year": 2023,
+"colors": [
+"prateado",
+"preto-espacial"
+]
+},
+{
+"id": "mbp-16-m3pro",
+"name": "MacBook Pro 16\" M3 Pro/Max (2023)",
+"year": 2023,
+"colors": [
+"prateado",
+"preto-espacial"
+]
+},
+{
+"id": "mba-13-m3",
+"name": "MacBook Air 13\" M3 (2024)",
+"year": 2024,
+"colors": [
+"meia-noite",
+"estelar",
+"cinza-espacial",
+"prateado"
+]
+},
+{
+"id": "mba-15-m3",
+"name": "MacBook Air 15\" M3 (2024)",
+"year": 2024,
+"colors": [
+"meia-noite",
+"estelar",
+"cinza-espacial",
+"prateado"
+]
+},
+{
+"id": "mbp-14-m4",
+"name": "MacBook Pro 14\" M4 (2024)",
+"year": 2024,
+"colors": [
+"prateado",
+"preto-espacial"
+]
+},
+{
+"id": "mbp-16-m4",
+"name": "MacBook Pro 16\" M4 Pro/Max (2024)",
+"year": 2024,
+"colors": [
+"prateado",
+"preto-espacial"
+]
+},
+{
+"id": "mba-13-m4",
+"name": "MacBook Air 13\" M4 (2025)",
+"year": 2025,
+"colors": [
+"azul-ceu",
+"prateado",
+"estelar",
+"meia-noite"
+]
+},
+{
+"id": "mba-15-m4",
+"name": "MacBook Air 15\" M4 (2025)",
+"year": 2025,
+"colors": [
+"azul-ceu",
+"prateado",
+"estelar",
+"meia-noite"
+]
+},
+{
+"id": "mbp-14-m5",
+"name": "MacBook Pro 14\" M5 (2025)",
+"year": 2025,
+"colors": [
+"prateado",
+"preto-espacial"
+]
+},
+{
+"id": "mba-13-m5",
+"name": "MacBook Air 13\" M5 (2026)",
+"year": 2026,
+"colors": [
+"azul-ceu",
+"prateado",
+"estelar",
+"meia-noite"
+]
+},
+{
+"id": "mba-15-m5",
+"name": "MacBook Air 15\" M5 (2026)",
+"year": 2026,
+"colors": [
+"azul-ceu",
+"prateado",
+"estelar",
+"meia-noite"
+]
+},
+{
+"id": "mbp-14-m5pro",
+"name": "MacBook Pro 14\" M5 Pro/Max (2026)",
+"year": 2026,
+"colors": [
+"prateado",
+"preto-espacial"
+]
+},
+{
+"id": "mbp-16-m5pro",
+"name": "MacBook Pro 16\" M5 Pro/Max (2026)",
+"year": 2026,
+"colors": [
+"prateado",
+"preto-espacial"
+]
+},
+{
+"id": "neo-13",
+"name": "MacBook Neo 13\" (2026)",
+"year": 2026,
+"colors": [
+"prateado",
+"blush",
+"amarelo-citrico",
+"indigo"
+]
+}
+]

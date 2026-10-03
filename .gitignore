@@ -1,0 +1,5 @@
+.DS_Store
+*.log
+tools/fotos-oficiais/estilizar
+tools/textura/pedra
+.vercel
