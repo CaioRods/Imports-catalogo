@@ -152,13 +152,17 @@ tools/textura/        gerador da textura de pedra
   - os eventos vão em lote para `site_track`, em texto puro; ao sair da página, vão por `sendBeacon` com `?apikey=`.
 - **Rodapé:** WhatsApp, os dois Instagrams, "© Imports Brasil. Todos os direitos reservados." e a assinatura **CRdevs** em branco ("CR" bem grosso), que leva a `instagram.com/caio.riguess`.
 
-### IMPRTS Assistência (`assistencia.html`, em importsbrasil.com/assistencia)
-- Mesmo estilo, menu, conta, rodapé, abertura e transições do site. Link "Assistência" no menu da loja.
-- **Logo:** o mesmo IMPRTS com "ASSISTÊNCIA" embaixo. Na maçã, uma **chave fixa** na diagonal "\" (bocas em cima à esquerda e embaixo à direita) e uma **chave de fenda** na "/" (cabo em cima à direita, ponta embaixo à esquerda), em X, saindo da maçã. Maçã e ferramentas são **um vetor só** (união real, sem borda). IMP e RTS ficam um pouco mais afastados para as pontas caberem.
-  - Gerado por `tools/assistencia/`: `maca.py` (desenha a maçã; precisa do `shapely`) → `logos.py` (logo do menu, logo cromado do topo, cortina da abertura) → `aplicar.py` (troca só esses desenhos no `assistencia.html`). `img/apple-assist.svg` é a maçã sozinha, usada na transição.
-- **Abertura e transição:** iguais às da loja, mas a janela é a maçã com as ferramentas (`html[data-site="assist"]` no CSS).
-- **Conteúdo** (só informação que a loja já usa): conserta iPhone, MacBook e drones DJI, na loja, pela equipe; como funciona em 3 passos; IMPRTS Assistance (3 meses sem mão de obra para celular comprado na loja). Sem preços nem prazos.
-- **Pedir orçamento** (`quote()` em `interesse.js`): tipo de aparelho, modelo e problema; usa a conta salva no celular e abre o WhatsApp da loja com a mensagem pronta. Não grava nada no banco.
+### IMPRTS Assistência (`assistencia.html`, em importsbrasil.com/assistencia) — **só iPhone**
+- **Design próprio, estilo Apple** (vem da ideia guardada no branch `ideia-redesign`): tema **claro e escuro** (segue o celular; botão no menu; `imprts.tema`), fonte SF, blocos arredondados, botões em pílula. CSS em `assets/assist.css` (tokens dos dois temas também ajustam menu, janela e rodapé); lógica em `assets/assist.js`.
+- **Logo:** o mesmo IMPRTS com "ASSISTÊNCIA" embaixo; na maçã, **chave fixa** na diagonal "\" (bocas em cima à esquerda e embaixo à direita) e **chave de fenda** na "/" (cabo em cima à direita, ponta embaixo à esquerda), em X, saindo da maçã; maçã + ferramentas = **um vetor só**. IMP e RTS um pouco mais afastados. O cromado vira grafite no tema claro.
+  - Gerado por `tools/assistencia/`: `maca.py` (desenha a maçã; precisa do `shapely`) → `logos.py` (logo do menu, logo do topo, cortina da abertura) → `aplicar.py` (troca só esses desenhos no `assistencia.html`). `img/apple-assist.svg` = só a maçã (transição e fundo do topo).
+- **Topo:** iPhone oficial "respirando" na frente de uma maçã-com-ferramentas gigante e sutil que balança devagar.
+- **Montador de orçamento:** 1) "Qual é o seu iPhone?" (41 opções com as capas oficiais, do mais novo ao mais antigo, + "Não sei o modelo"; lista em `assets/iphones.js`, gerada por `tools/assistencia/iphones.py` a partir de `tools/fotos-oficiais/iphones.json` — rodar de novo quando entrar modelo novo); 2) "O que está acontecendo?" (sintomas que o cliente marca: tela, bateria, não carrega, câmera, Face ID…; **não é lista de serviço nem de preço**); 3) detalhes. Uma barra flutuante resume e abre a confirmação (`quote()` em `interesse.js`, com a conta salva no celular) → WhatsApp da loja. Não grava no banco.
+- Blocos (IMPRTS Assistance 3 meses, conserto na loja pela equipe, orçamento pelo WhatsApp) e "Como funciona" em 3 passos. Sem preços nem prazos.
+- Abertura e transições iguais às da loja, com a maçã das ferramentas como janela.
+
+### Menu (todas as páginas)
+- Cápsula de vidro flutuante (`.nav` no `style.css`), página atual em pílula (`aria-current="page"`), brilho fino passando na borda, encolhe ao rolar. Links: Loja · Catálogo · Assistência · Contato + conta (e tema, só na assistência). No celular some o que não cabe (`hide-m`); os tamanhos de celular ficam no fim do `style.css`.
 
 ### Design do site
 - **Mesma linguagem do sistema.** Paleta em `:root`:

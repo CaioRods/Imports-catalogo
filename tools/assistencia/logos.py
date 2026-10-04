@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera os SVGs do logo IMPRTS Assistência a partir de tools/assistencia/maca.json (rode maca.py antes).
+"""Gera os SVGs do logo IMPRTS Assistência (o cromado do topo troca de cor pelo tema: variáveis --ch0…--ch7, --ct0…--ct2) a partir de tools/assistencia/maca.json (rode maca.py antes).
 Imprime/grava os pedaços usados pela página assistencia.html:
   tools/assistencia/logo-nav.svg   — logo pequeno do menu (uma cor, currentColor)
   tools/assistencia/logo-hero.svg  — logo cromado do topo (mesmos efeitos do logo da loja)
@@ -22,8 +22,8 @@ nav = f'<svg class="logo logo-assist" viewBox="{VX} {VY} {VW} 98" role="img" ari
 
 hero = f'''<svg class="logo logo-hero logo-assist" viewBox="{VB}" role="img" aria-label="IMPRTS Assistência">
 <defs>
-<linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.18" stop-color="#e9eaed"/><stop offset="0.42" stop-color="#8d9096"/><stop offset="0.5" stop-color="#5d6066"/><stop offset="0.56" stop-color="#c9cbcf"/><stop offset="0.72" stop-color="#f5f6f7"/><stop offset="0.86" stop-color="#a3a6ab"/><stop offset="1" stop-color="#6e7176"/></linearGradient>
-<linearGradient id="chrome-t" x1="0" y1="{TY - 14}" x2="0" y2="{TY + 2}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#9c9fa5"/><stop offset="1" stop-color="#e9eaed"/></linearGradient>
+<linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ch0, #ffffff)"/><stop offset="0.18" style="stop-color:var(--ch1, #e9eaed)"/><stop offset="0.42" style="stop-color:var(--ch2, #8d9096)"/><stop offset="0.5" style="stop-color:var(--ch3, #5d6066)"/><stop offset="0.56" style="stop-color:var(--ch4, #c9cbcf)"/><stop offset="0.72" style="stop-color:var(--ch5, #f5f6f7)"/><stop offset="0.86" style="stop-color:var(--ch6, #a3a6ab)"/><stop offset="1" style="stop-color:var(--ch7, #6e7176)"/></linearGradient>
+<linearGradient id="chrome-t" x1="0" y1="{TY - 14}" x2="0" y2="{TY + 2}" gradientUnits="userSpaceOnUse"><stop offset="0" style="stop-color:var(--ct0, #ffffff)"/><stop offset=".55" style="stop-color:var(--ct1, #9c9fa5)"/><stop offset="1" style="stop-color:var(--ct2, #e9eaed)"/></linearGradient>
 <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
 <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".85"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
 <animateTransform attributeName="gradientTransform" type="translate" values="-1 0;1 0;1 0" keyTimes="0;.55;1" dur="6s" begin="1.6s" repeatCount="indefinite"/>
@@ -33,7 +33,7 @@ hero = f'''<svg class="logo logo-hero logo-assist" viewBox="{VB}" role="img" ari
 <feSpecularLighting in="b" surfaceScale="2.6" specularConstant=".9" specularExponent="22" lighting-color="#ffffff" result="s"><fePointLight x="156" y="-140" z="160"/></feSpecularLighting>
 <feComposite in="s" in2="SourceAlpha" operator="in" result="s2"/>
 <feComposite in="SourceGraphic" in2="s2" operator="arithmetic" k1="0" k2="1" k3=".55" k4="0" result="lit"/>
-<feDropShadow in="lit" dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".75"/>
+<feDropShadow in="lit" dx="0" dy="3" stdDeviation="4" flood-color="#000" style="flood-opacity:var(--logo-shadow, .75)"/>
 </filter>
 <clipPath id="letters"><path d="{L}{M}"/></clipPath>
 </defs>

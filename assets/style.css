@@ -55,25 +55,54 @@ body { position: relative; }
 .hero { background: none !important; }
 .hero::before { display: none; }
 
-/* ——— barra do topo ——— */
+/* ——— barra do topo: cápsula de vidro flutuante (mesma em todas as páginas) ——— */
 .nav {
-  position: fixed; inset: 0 0 auto 0; z-index: 50; height: 56px;
-  display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-  background: rgba(0,0,0,.55); backdrop-filter: saturate(160%) blur(18px); -webkit-backdrop-filter: saturate(160%) blur(18px);
-  border-bottom: 1px solid transparent; transition: border-color .3s, background .3s;
+  position: fixed; z-index: 50; top: calc(10px + env(safe-area-inset-top)); left: 50%; translate: -50% 0;
+  width: min(1040px, calc(100% - 20px)); height: 54px; padding: 0 7px 0 20px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: linear-gradient(180deg, rgba(38,38,42,.62), rgba(14,14,16,.58));
+  backdrop-filter: saturate(180%) blur(22px); -webkit-backdrop-filter: saturate(180%) blur(22px);
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 14px 40px -16px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.1), inset 0 -1px 0 rgba(0,0,0,.4);
+  transition: height .45s var(--ease), top .45s var(--ease), background .45s var(--ease), box-shadow .45s var(--ease);
+  animation: nav-in .9s var(--ease) both;
 }
-.nav.scrolled { border-bottom-color: var(--hair); background: rgba(0,0,0,.72); }
-.nav-links { display: flex; gap: 22px; font-size: 14px; color: var(--dim); }
-.nav-links a:hover { color: var(--text); }
-.nav-links { align-items: center; }
+/* brilho fino que passa devagar pela borda de cima */
+.nav::before { content: ""; position: absolute; left: 22px; right: 22px; top: -1px; height: 1px; border-radius: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent) 0 0 / 40% 100% no-repeat; animation: nav-glint 7s ease-in-out 1.5s infinite; }
+.nav.scrolled { top: calc(6px + env(safe-area-inset-top)); height: 48px; background: linear-gradient(180deg, rgba(30,30,34,.82), rgba(10,10,12,.8)); }
+.nav > a:first-child { display: flex; align-items: center; transition: opacity .25s, transform .25s var(--ease); }
+.nav > a:first-child:hover { opacity: .8; }
+.nav > a:first-child:active { transform: scale(.96); }
+.nav-links { display: flex; align-items: center; gap: 2px; font-size: 14px; color: var(--dim); }
+.nav-links a { position: relative; padding: 8px 14px; border-radius: 999px; transition: color .25s, background .25s, transform .2s var(--ease); white-space: nowrap; }
+.nav-links a:hover { color: var(--text); background: rgba(255,255,255,.07); }
+.nav-links a:active { transform: scale(.95); }
+.nav-links a[aria-current="page"] { color: var(--text); background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.14); }
+.nav-links .acct, .nav-links .theme-btn { margin-left: 4px; }
+@keyframes nav-in { from { opacity: 0; translate: -50% -14px; } to { opacity: 1; translate: -50% 0; } }
+@keyframes nav-glint { 0%, 100% { background-position: -60% 0; } 50% { background-position: 160% 0; } }
+@media (max-width: 640px) {
+  .nav { height: 50px; padding: 0 5px 0 16px; }
+  .nav.scrolled { height: 46px; }
+  .nav-links { font-size: 13.5px; gap: 0; }
+  .nav-links a { padding: 7px 9px; }
+
+  .nav-links .hide-m { display: none; }
+}
+/* botão de tema (só na assistência, que tem claro e escuro) */
+.theme-btn { flex: none; width: 34px; height: 34px; padding: 0; border-radius: 50%; border: 0; background: transparent; color: var(--dim); display: grid; place-items: center; cursor: pointer;
+  transition: color .2s, background .2s, transform .2s var(--ease); }
+.theme-btn:hover { color: var(--text); background: rgba(255,255,255,.08); }
+.theme-btn:active { transform: scale(.9) rotate(-20deg); }
+.theme-btn svg { width: 17px; height: 17px; }
 /* conta neste celular: ícone de pessoa ou as iniciais */
-.acct { flex: none; width: 30px; height: 30px; margin: -4px 0; padding: 0; border-radius: 50%; border: 1px solid var(--hair-strong); background: transparent; color: var(--dim);
+.acct { flex: none; width: 38px; height: 38px; margin: 0; padding: 0; border-radius: 50%; border: 1px solid var(--hair-strong); background: transparent; color: var(--dim);
   display: grid; place-items: center; cursor: pointer; font: 600 11.5px var(--font); letter-spacing: .02em; transition: background .2s, color .2s, border-color .2s, transform .2s var(--ease); }
 .acct:hover { color: var(--text); border-color: rgba(255,255,255,.35); }
 .acct:active { transform: scale(.92); }
 .acct svg { width: 15px; height: 15px; }
 .acct.on { background: linear-gradient(180deg, #fafafa, #c9cacd); color: #0a0a0b; border-color: transparent; }
-@media (max-width: 640px) { .nav-links .hide-m { display: none; } }
 
 /* ——— botões ——— */
 .btn {
@@ -264,7 +293,7 @@ footer .row { display: flex; flex-wrap: wrap; gap: 26px; justify-content: space-
 footer a:hover { color: var(--text); }
 
 /* ——— página do produto ——— */
-.product { padding-top: 56px; }
+.product { padding-top: 74px; }
 .gallery { position: relative; }
 .slides { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .slides::-webkit-scrollbar { display: none; }
@@ -422,26 +451,6 @@ html.intro .intro-curtain { display: grid; place-items: center; position: fixed;
 .nav svg.logo-assist { height: 20px; }
 .hero-logo svg.logo-assist { height: clamp(96px, 26vw, 210px); }
 @media (max-width: 720px) { .hero-logo svg.logo-assist { height: 27vw; } }
-/* aparelhos que a assistência conserta: toque abre o pedido de orçamento já com o tipo escolhido */
-.fix-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 26px; }
-@media (min-width: 720px) { .fix-grid { gap: 18px; } }
-.fix { appearance: none; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px 16px; border-radius: var(--radius);
-  background: linear-gradient(180deg, #121215, #0a0a0c); border: 1px solid var(--hair); color: var(--text); font: inherit; cursor: pointer;
-  transition: transform .35s var(--ease), border-color .35s; }
-.fix:hover { transform: translateY(-4px); border-color: var(--hair-strong); }
-.fix:active { transform: scale(.97); }
-.fix .pic { width: 100%; aspect-ratio: 1; display: grid; place-items: center; background: radial-gradient(70% 60% at 50% 40%, rgba(255,255,255,.09), transparent 70%); }
-.fix .pic img { width: 92%; height: 92%; object-fit: contain; transition: transform .7s var(--ease); }
-.fix:hover .pic img { transform: scale(1.05); }
-.fix b { font-size: clamp(14px, 3.8vw, 19px); font-weight: 600; letter-spacing: -.01em; }
-.fix .go { font-size: 12px; color: var(--dim); }
-.fix .go::after { content: " ›"; }
-/* janela do orçamento */
-.seg { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
-.seg button { appearance: none; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--hair-strong); background: transparent; color: var(--dim);
-  font: 500 14px var(--font); cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .2s var(--ease); }
-.seg button:active { transform: scale(.95); }
-.seg button.on { background: var(--text); color: #000; border-color: var(--text); }
 .sheet textarea { display: block; width: 100%; margin-top: 7px; padding: 13px 15px; font: 16px/1.4 var(--font); color: var(--text); background: rgba(255,255,255,.05);
   border: 1px solid var(--hair-strong); border-radius: 14px; outline: none; resize: vertical; min-height: 84px; transition: border-color .2s, background .2s; }
 .sheet textarea:focus { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.08); }
@@ -450,3 +459,11 @@ html[data-site="assist"] .intro-curtain .zoom { width: min(74vw, 500px); transfo
 html[data-site="assist"].vt-page::view-transition-new(root) {
   -webkit-mask-image: url(../img/apple-assist.svg); mask-image: url(../img/apple-assist.svg);
   -webkit-mask-position: 49% 55%; mask-position: 49% 55%; }
+
+/* menu no celular (no fim do arquivo para valer sobre os tamanhos padrão) */
+@media (max-width: 640px) {
+  .nav svg.logo { height: 15px; }
+  .nav svg.logo-assist { height: 17px; }
+  .acct { width: 34px; height: 34px; }
+  .theme-btn { width: 32px; height: 32px; }
+}

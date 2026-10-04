@@ -333,18 +333,21 @@
     };
   }
 
-  /* ——— assistência: pedido de orçamento (aparelho + problema) direto no WhatsApp, com a conta salva ——— */
-  const KINDS = ["iPhone", "MacBook", "Drone DJI", "Outro"];
-  function quote(kind) {
+  /* ——— assistência (só iPhone): confirma o pedido de orçamento montado na página e abre o WhatsApp ———
+     pre = { model: "iPhone 13 Pro", issues: ["Tela quebrada", …], details: "…" } */
+  function quote(pre) {
+    pre = pre && typeof pre === "object" ? pre : {};
     const s = account0();
-    let pick = KINDS.includes(kind) ? kind : "";
+    const issues = Array.isArray(pre.issues) ? pre.issues : [];
     const { el, close, f, read, err } = sheet(`
       <div class="qt">
         <h2 id="sheet-t">Pedir orçamento</h2>
-        <p class="sheet-sub">Conte o aparelho e o que está acontecendo. O pedido chega no WhatsApp da <b>IMPRTS Assistência</b>.</p>
-        <div class="seg" role="group" aria-label="Aparelho">${KINDS.map(k => `<button type="button" class="${k === pick ? "on" : ""}" data-k="${k}">${k}</button>`).join("")}</div>
-        <label>Modelo<input name="model" autocomplete="off" placeholder="Ex.: iPhone 13 Pro, MacBook Air M1, DJI Mini 3"></label>
-        <label>O que está acontecendo?<textarea name="issue" rows="3" placeholder="Ex.: tela trincada, bateria acabando rápido, não liga"></textarea></label>
+        <p class="sheet-sub">Confira o pedido. Ele chega no WhatsApp da <b>IMPRTS Assistência</b>.</p>
+        <div class="qt-sum">
+          <span class="qt-dev">${esc(pre.model || "iPhone")}</span>
+          ${issues.length ? `<span class="qt-iss">${issues.map(esc).join(" · ")}</span>` : ""}
+        </div>
+        <label>Quer contar mais? <span>(opcional)</span><textarea name="issue" rows="3" placeholder="Ex.: caiu e a tela ficou preta, bateria acaba antes do almoço">${esc(pre.details || "")}</textarea></label>
         <p class="sheet-who"${s ? "" : " hidden"}></p>
         <div class="who-fields"${s ? " hidden" : ""}>${fields(s || saved())}</div>
         <p class="sheet-err" hidden></p>
@@ -355,14 +358,11 @@
     if (s) {
       who.innerHTML = `Enviando como <b>${esc(s.name)}</b> · ${esc(maskPhone(s.phone))} <button class="linkbtn edit">Alterar</button>`;
       $(".edit", el).onclick = () => { who.hidden = true; box.hidden = false; f("name").focus(); };
-    }
-    $$(".seg button", el).forEach(b => b.onclick = () => { pick = b.dataset.k; $$(".seg button", el).forEach(x => x.classList.toggle("on", x === b)); f("model").focus(); });
-    setTimeout(() => (pick ? f("model") : $(".seg button", el)).focus(), 350);
+    } else setTimeout(() => f("name").focus(), 350);
 
     $(".send", el).onclick = () => {
-      const model = f("model").value.trim(), issue = $("textarea[name=issue]", el).value.trim().replace(/\s+\n/g, "\n");
-      if (!pick) return err(".qt", "Escolha o tipo de aparelho.");
-      if (issue.length < 3) return err(".qt", "Conte o que está acontecendo com o aparelho.");
+      const details = $("textarea[name=issue]", el).value.trim();
+      if (!issues.length && details.length < 3) return err(".qt", "Conte o que está acontecendo com o iPhone.");
       const c = box.hidden ? s : read(), e = check(c);
       if (e) { who.hidden = true; box.hidden = false; return err(".qt", e); }
       err(".qt", "");
@@ -370,8 +370,9 @@
       const text = [
         "Olá, IMPRTS Assistência! Quero um orçamento:",
         "",
-        `*Aparelho:* ${pick}${model ? ` · ${model}` : ""}`,
-        `*Problema:* ${issue}`,
+        `*Aparelho:* ${pre.model || "iPhone"}`,
+        issues.length ? `*Problema:* ${issues.join(", ")}` : null,
+        details ? `*Detalhes:* ${details}` : null,
         "",
         "*Meus dados*",
         `Nome: ${c.name}`,

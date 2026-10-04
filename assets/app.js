@@ -423,7 +423,7 @@
   }
   addEventListener("imprts:conta", contaBtn);
   addEventListener("storage", e => { if (e.key === CONTA) contaBtn(); });
-  window.IMPRTS_UI = { money, esc, code, images, promo, now, wa, waIcon, flush, visitor, CONDITION, PARTS };
+  window.IMPRTS_UI = { money, esc, code, images, promo, now, wa, waIcon, flush, visitor, CONDITION, PARTS, form: (b, fn) => withForm(b, fn) };
 
   function contacts() {
     $$("[data-wa]").forEach(a => { const l = wa(a.dataset.waText || "Olá! Vim pelo site da IMPRTS."); if (l) a.href = l; else a.style.display = "none"; });
