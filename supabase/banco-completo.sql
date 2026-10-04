@@ -60,7 +60,7 @@ alter table public.products add column if not exists cover text;
 alter table public.products add column if not exists promo_price numeric;
 alter table public.products add column if not exists promo_until timestamptz;
 
--- Código definitivo sai do servidor: os Macs nunca repetem número.
+-- Código definitivo sai do servidor: os 3 Macs nunca repetem número.
 create or replace function public.products_before_write() returns trigger
 language plpgsql as $$
 declare cur bigint;
@@ -142,7 +142,9 @@ create table if not exists public.activity (
 );
 create index if not exists activity_inserted_idx on public.activity (inserted_at);
 
--- ─── Configurações compartilhadas entre os Macs (PINs, perfis, Valores…) ─────
+-- ─── Configurações compartilhadas entre todos os Macs ────────────────────────
+-- (PINs, perfis e fotos, classes, tabela de Valores, aparelhos adicionados,
+--  contatos da loja, numeração dos orçamentos)
 create table if not exists public.kv (
   key        text primary key,
   value      jsonb not null,
@@ -158,8 +160,9 @@ end $$;
 drop trigger if exists kv_bw on public.kv;
 create trigger kv_bw before insert or update on public.kv for each row execute function public.kv_touch();
 
--- ─── Comandos da Alexa/Siri para os Macs ─────────────────────────────────────
--- Só ação + código (nada sensível), por isso a chave pública pode ler.
+-- ─── Comandos da Alexa para os Macs ──────────────────────────────────────────
+-- A Edge Function grava; o ajudante do IMPRTS em cada Mac lê e abre o app.
+-- Só contém ação + código (nada sensível), por isso a chave pública pode ler.
 create table if not exists public.commands (
   id         uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default clock_timestamp(),
@@ -198,8 +201,10 @@ $$;
 revoke all on function public.eh_loja() from public;
 grant execute on function public.eh_loja() to authenticated;
 
--- ─── Segurança das tabelas do app ────────────────────────────────────────────
+-- ─── Segurança ───────────────────────────────────────────────────────────────
+-- Os Macs entram com o usuário da loja (e-mail/senha criados em Authentication).
 -- A Alexa usa a service role dentro da Edge Function (não passa por estas regras).
+-- O site usa a chave pública e só enxerga a vitrine (sem custo, IMEI, cliente…).
 alter table public.products enable row level security;
 alter table public.repairs  enable row level security;
 alter table public.activity enable row level security;
@@ -218,7 +223,8 @@ drop policy if exists "loja: tudo" on public.kv;
 create policy "loja: tudo" on public.kv for all to authenticated
   using ((select public.eh_loja())) with check ((select public.eh_loja()));
 
--- Chave pública: só colunas sem nada interno (sem custo, IMEI, comprador, observações).
+-- Site: publicados e não excluídos; vendidos continuam visíveis por 7 dias com selo "Vendido".
+-- A chave pública só recebe colunas sem nada interno (sem custo, IMEI, comprador, observações).
 revoke all on public.products from anon;
 grant select (id, code, category, model_id, color_id, name, storage, ram, chip, battery_health,
               condition, parts, price, status, publish, created_at, updated_at, sold_at, deleted)
@@ -230,9 +236,10 @@ revoke all on public.repairs from anon;
 revoke all on public.activity from anon;
 revoke all on public.kv from anon;
 
--- ─── Vitrine (o que o site lê) ───────────────────────────────────────────────
+-- ─── Vitrine (o que o site enxerga) ──────────────────────────────────────────
+-- Sem custo, IMEI, cliente nem observações internas. Vendidos continuam por 7 dias com o selo "Vendido".
+-- Promoção (preço promocional com prazo opcional) só aparece enquanto vale.
 -- Roda com o dono da tabela de propósito: mostra descrição/fotos/promoção sem liberar a tabela.
--- Vendidos continuam por 7 dias com o selo "Vendido"; promoção só aparece enquanto vale.
 drop view if exists public.vitrine;
 create view public.vitrine as
 select p.id, p.code, p.category, p.model_id, p.color_id, p.name, p.storage, p.ram, p.chip,
@@ -321,7 +328,11 @@ end $$;
 revoke all on function public.siri(text, text, int, numeric, text) from public;
 grant execute on function public.siri(text, text, int, numeric, text) to anon, authenticated;
 
--- ─── Site: métricas de visita ────────────────────────────────────────────────
+-- ─── Clientes do site: interessados (formulário "Tenho interesse") + métricas de visita ───
+-- O site (chave pública) só ESCREVE pelas funções site_track e site_lead, que validam tudo;
+-- ler os dados é só para os Macs da loja (usuário autenticado).
+
+-- Eventos de navegação (visita, produto aberto, clique no catálogo, tempo na página)
 create table if not exists public.site_events (
   id bigint generated always as identity primary key,
   at timestamptz not null default now(),
