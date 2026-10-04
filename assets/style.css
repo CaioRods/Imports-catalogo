@@ -417,3 +417,36 @@ html.intro .intro-curtain { display: grid; place-items: center; position: fixed;
   html.intro .intro-curtain { display: none; }
   html.intro .hero { --intro: 0s; }
 }
+
+/* ——— IMPRTS Assistência (assistencia.html) ——— */
+.nav svg.logo-assist { height: 20px; }
+.hero-logo svg.logo-assist { height: clamp(96px, 26vw, 210px); }
+@media (max-width: 720px) { .hero-logo svg.logo-assist { height: 27vw; } }
+/* aparelhos que a assistência conserta: toque abre o pedido de orçamento já com o tipo escolhido */
+.fix-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 26px; }
+@media (min-width: 720px) { .fix-grid { gap: 18px; } }
+.fix { appearance: none; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px 16px; border-radius: var(--radius);
+  background: linear-gradient(180deg, #121215, #0a0a0c); border: 1px solid var(--hair); color: var(--text); font: inherit; cursor: pointer;
+  transition: transform .35s var(--ease), border-color .35s; }
+.fix:hover { transform: translateY(-4px); border-color: var(--hair-strong); }
+.fix:active { transform: scale(.97); }
+.fix .pic { width: 100%; aspect-ratio: 1; display: grid; place-items: center; background: radial-gradient(70% 60% at 50% 40%, rgba(255,255,255,.09), transparent 70%); }
+.fix .pic img { width: 92%; height: 92%; object-fit: contain; transition: transform .7s var(--ease); }
+.fix:hover .pic img { transform: scale(1.05); }
+.fix b { font-size: clamp(14px, 3.8vw, 19px); font-weight: 600; letter-spacing: -.01em; }
+.fix .go { font-size: 12px; color: var(--dim); }
+.fix .go::after { content: " ›"; }
+/* janela do orçamento */
+.seg { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.seg button { appearance: none; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--hair-strong); background: transparent; color: var(--dim);
+  font: 500 14px var(--font); cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .2s var(--ease); }
+.seg button:active { transform: scale(.95); }
+.seg button.on { background: var(--text); color: #000; border-color: var(--text); }
+.sheet textarea { display: block; width: 100%; margin-top: 7px; padding: 13px 15px; font: 16px/1.4 var(--font); color: var(--text); background: rgba(255,255,255,.05);
+  border: 1px solid var(--hair-strong); border-radius: 14px; outline: none; resize: vertical; min-height: 84px; transition: border-color .2s, background .2s; }
+.sheet textarea:focus { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.08); }
+/* abertura e transição usam a maçã com as ferramentas */
+html[data-site="assist"] .intro-curtain .zoom { width: min(74vw, 500px); transform-origin: 47.8% 40.25%; }
+html[data-site="assist"].vt-page::view-transition-new(root) {
+  -webkit-mask-image: url(../img/apple-assist.svg); mask-image: url(../img/apple-assist.svg);
+  -webkit-mask-position: 49% 55%; mask-position: 49% 55%; }

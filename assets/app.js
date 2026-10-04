@@ -201,10 +201,8 @@
     return el;
   }
 
-  async function home() {
-    navShadow();
-    revealOnScroll();
-    // parallax do hero
+  // parallax do topo (aparelhos descem e somem devagar ao rolar)
+  function heroParallax() {
     const stage = $(".stage");
     if (stage && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       addEventListener("scroll", () => {
@@ -213,6 +211,12 @@
         stage.style.opacity = String(1 - y / innerHeight * .9);
       }, { passive: true });
     }
+  }
+
+  async function home() {
+    navShadow();
+    revealOnScroll();
+    heroParallax();
     const grid = $("#grid");
     let all = cached();
     let cat = "todos", q = "", sort = "novos";
@@ -269,6 +273,14 @@
         all = fresh; $("#count").textContent = all.filter(p => !p.vendido).length; render(true);
       } catch {}
     }, 60000);
+  }
+
+  /* ——— assistência técnica ——— */
+  function assist() {
+    navShadow();
+    revealOnScroll();
+    heroParallax();
+    $$("[data-quote]").forEach(b => b.addEventListener("click", () => withForm(b, f => f.quote(b.dataset.quote || ""))));
   }
 
   /* ——— página do produto ——— */
@@ -414,7 +426,7 @@
   window.IMPRTS_UI = { money, esc, code, images, promo, now, wa, waIcon, flush, visitor, CONDITION, PARTS };
 
   function contacts() {
-    $$("[data-wa]").forEach(a => { const l = wa("Olá! Vim pelo site da IMPRTS."); if (l) a.href = l; else a.style.display = "none"; });
+    $$("[data-wa]").forEach(a => { const l = wa(a.dataset.waText || "Olá! Vim pelo site da IMPRTS."); if (l) a.href = l; else a.style.display = "none"; });
     $$("[data-igs]").forEach(box => {
       box.innerHTML = (C.instagrams || []).map(u => `<a href="https://instagram.com/${esc(u)}" target="_blank" rel="noopener">@${esc(u)}</a>`).join("");
     });
@@ -434,6 +446,7 @@
     renderSeals();
     if (document.body.dataset.page === "home") home();
     if (document.body.dataset.page === "product") product();
+    if (document.body.dataset.page === "assist") assist();
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

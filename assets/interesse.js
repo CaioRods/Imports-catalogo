@@ -5,6 +5,7 @@
   const U = window.IMPRTS_UI;
   const { money, esc, code } = U;
   const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const KEY = "imprts.cliente";
 
   const onlyDigits = s => String(s || "").replace(/\D/g, "");
@@ -332,5 +333,57 @@
     };
   }
 
-  window.IMPRTS_INTERESSE = { open, account };
+  /* ——— assistência: pedido de orçamento (aparelho + problema) direto no WhatsApp, com a conta salva ——— */
+  const KINDS = ["iPhone", "MacBook", "Drone DJI", "Outro"];
+  function quote(kind) {
+    const s = account0();
+    let pick = KINDS.includes(kind) ? kind : "";
+    const { el, close, f, read, err } = sheet(`
+      <div class="qt">
+        <h2 id="sheet-t">Pedir orçamento</h2>
+        <p class="sheet-sub">Conte o aparelho e o que está acontecendo. O pedido chega no WhatsApp da <b>IMPRTS Assistência</b>.</p>
+        <div class="seg" role="group" aria-label="Aparelho">${KINDS.map(k => `<button type="button" class="${k === pick ? "on" : ""}" data-k="${k}">${k}</button>`).join("")}</div>
+        <label>Modelo<input name="model" autocomplete="off" placeholder="Ex.: iPhone 13 Pro, MacBook Air M1, DJI Mini 3"></label>
+        <label>O que está acontecendo?<textarea name="issue" rows="3" placeholder="Ex.: tela trincada, bateria acabando rápido, não liga"></textarea></label>
+        <p class="sheet-who"${s ? "" : " hidden"}></p>
+        <div class="who-fields"${s ? " hidden" : ""}>${fields(s || saved())}</div>
+        <p class="sheet-err" hidden></p>
+        <button class="btn wa send">${U.waIcon()} Enviar pelo WhatsApp</button>
+        <p class="sheet-note">Seus dados ficam guardados neste celular e são usados só pela IMPRTS para falar com você.</p>
+      </div>`);
+    const who = $(".sheet-who", el), box = $(".who-fields", el);
+    if (s) {
+      who.innerHTML = `Enviando como <b>${esc(s.name)}</b> · ${esc(maskPhone(s.phone))} <button class="linkbtn edit">Alterar</button>`;
+      $(".edit", el).onclick = () => { who.hidden = true; box.hidden = false; f("name").focus(); };
+    }
+    $$(".seg button", el).forEach(b => b.onclick = () => { pick = b.dataset.k; $$(".seg button", el).forEach(x => x.classList.toggle("on", x === b)); f("model").focus(); });
+    setTimeout(() => (pick ? f("model") : $(".seg button", el)).focus(), 350);
+
+    $(".send", el).onclick = () => {
+      const model = f("model").value.trim(), issue = $("textarea[name=issue]", el).value.trim().replace(/\s+\n/g, "\n");
+      if (!pick) return err(".qt", "Escolha o tipo de aparelho.");
+      if (issue.length < 3) return err(".qt", "Conte o que está acontecendo com o aparelho.");
+      const c = box.hidden ? s : read(), e = check(c);
+      if (e) { who.hidden = true; box.hidden = false; return err(".qt", e); }
+      err(".qt", "");
+      store(c);
+      const text = [
+        "Olá, IMPRTS Assistência! Quero um orçamento:",
+        "",
+        `*Aparelho:* ${pick}${model ? ` · ${model}` : ""}`,
+        `*Problema:* ${issue}`,
+        "",
+        "*Meus dados*",
+        `Nome: ${c.name}`,
+        `Telefone: ${maskPhone(c.phone)}`,
+        c.email ? `E-mail: ${c.email}` : null,
+      ].filter(l => l !== null).join("\n");
+      U.flush();
+      const url = U.wa(text);
+      if (url) location.href = url;
+      setTimeout(close, 900);
+    };
+  }
+
+  window.IMPRTS_INTERESSE = { open, account, quote };
 })();
