@@ -94,20 +94,20 @@ body { position: relative; }
   background: radial-gradient(60% 50% at 50% 30%, rgba(255,255,255,.16), rgba(255,255,255,.03) 45%, transparent 70%);
 }
 .hero-inner { text-align: center; position: relative; z-index: 2; width: 100%; }
-.eyebrow { font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--dim); margin: 0 0 18px; opacity: 0; animation: up 1s .2s var(--ease) forwards; }
-.hero h1 { font-size: clamp(46px, 13vw, 118px); font-weight: 500; letter-spacing: 0; line-height: 1; margin: 0; opacity: 0; animation: up 1.2s .35s var(--ease) forwards; }
-.hero-logo { margin: 0 auto; opacity: 0; animation: up 1.2s .35s var(--ease) forwards; }
+.eyebrow { font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--dim); margin: 0 0 18px; opacity: 0; animation: up 1s calc(var(--intro, 0s) + .2s) var(--ease) forwards; }
+.hero h1 { font-size: clamp(46px, 13vw, 118px); font-weight: 500; letter-spacing: 0; line-height: 1; margin: 0; opacity: 0; animation: up 1.2s calc(var(--intro, 0s) + .35s) var(--ease) forwards; }
+.hero-logo { margin: 0 auto; opacity: 0; animation: up 1.2s calc(var(--intro, 0s) + .35s) var(--ease) forwards; }
 .hero-logo svg.logo-hero { display: block; height: clamp(56px, 15vw, 132px); width: auto; margin: 0 auto; overflow: visible; }
-.hero p.lead { color: var(--dim); font-size: clamp(16px, 4.2vw, 21px); max-width: 560px; margin: 22px auto 30px; opacity: 0; animation: up 1.2s .55s var(--ease) forwards; }
-.hero .ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: up 1.2s .7s var(--ease) forwards; }
+.hero p.lead { color: var(--dim); font-size: clamp(16px, 4.2vw, 21px); max-width: 560px; margin: 22px auto 30px; opacity: 0; animation: up 1.2s calc(var(--intro, 0s) + .55s) var(--ease) forwards; }
+.hero .ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: up 1.2s calc(var(--intro, 0s) + .7s) var(--ease) forwards; }
 @keyframes up { from { opacity: 0; transform: translateY(24px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
 
 .stage { position: relative; height: min(66vw, 470px); margin: 40px auto 0; max-width: 940px; }
 .stage .dev { position: absolute; bottom: 0; will-change: transform; }
 .stage .dev img { width: 100%; height: auto; }
-.stage .d1 { left: 50%; width: min(60vw, 430px); margin-left: calc(min(60vw, 430px) / -2); z-index: 3; animation: rise 1.4s .9s var(--ease) both, float 7s 2.3s ease-in-out infinite; }
-.stage .d2 { left: 2%; width: min(40vw, 300px); z-index: 2; animation: rise2 1.4s 1.15s var(--ease) both, float 8s 2.6s ease-in-out infinite; }
-.stage .d3 { right: 2%; width: min(40vw, 300px); z-index: 2; animation: rise2 1.4s 1.3s var(--ease) both, float 9s 2.7s ease-in-out infinite; }
+.stage .d1 { left: 50%; width: min(60vw, 430px); margin-left: calc(min(60vw, 430px) / -2); z-index: 3; animation: rise 1.4s calc(var(--intro, 0s) + .9s) var(--ease) both, float 7s 2.3s ease-in-out infinite; }
+.stage .d2 { left: 2%; width: min(40vw, 300px); z-index: 2; animation: rise2 1.4s calc(var(--intro, 0s) + 1.15s) var(--ease) both, float 8s 2.6s ease-in-out infinite; }
+.stage .d3 { right: 2%; width: min(40vw, 300px); z-index: 2; animation: rise2 1.4s calc(var(--intro, 0s) + 1.3s) var(--ease) both, float 9s 2.7s ease-in-out infinite; }
 @keyframes rise { from { opacity: 0; transform: translateY(80px) scale(.92); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes rise2 { from { opacity: 0; transform: translateY(60px) scale(.9); filter: blur(10px); } to { opacity: .92; transform: none; filter: none; } }
 .stage .glow { position: absolute; left: 50%; bottom: 8%; width: 70%; height: 70%; transform: translateX(-50%); border-radius: 50%;
@@ -118,7 +118,7 @@ body { position: relative; }
   -webkit-mask: radial-gradient(70% 60% at 50% 0%, #000, transparent); mask: radial-gradient(70% 60% at 50% 0%, #000, transparent);
   animation: rays 30s linear infinite alternate; }
 @keyframes rays { to { transform: rotate(8deg); } }
-.tagline { font-size: clamp(22px, 6vw, 40px); font-weight: 300; letter-spacing: -.01em; margin: 18px auto 0; max-width: 760px; line-height: 1.15; opacity: 0; animation: up 1.2s .5s var(--ease) forwards; }
+.tagline { font-size: clamp(22px, 6vw, 40px); font-weight: 300; letter-spacing: -.01em; margin: 18px auto 0; max-width: 760px; line-height: 1.15; opacity: 0; animation: up 1.2s calc(var(--intro, 0s) + .5s) var(--ease) forwards; }
 @keyframes float { 0%,100% { translate: 0 0; } 50% { translate: 0 -12px; } }
 .stage .floor { position: absolute; left: 10%; right: 10%; bottom: -6px; height: 40px; background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,.18), transparent 70%); filter: blur(10px); z-index: 1; }
 /* reflexo de luz só sobre os aparelhos (recortado no formato de cada um) */
@@ -365,3 +365,55 @@ html.noscroll { overflow: hidden; }
 .ficha-img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; }
 .ficha-load { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.06) 50%, transparent 70%) 0 0 / 200% 100%; animation: shimmer 1.2s linear infinite; }
 @keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ——— transições entre telas: a maçã do logo abre a próxima tela (Chrome e Safari do iOS 18.2+) ——— */
+@view-transition { navigation: auto; }
+::view-transition-group(*) { animation-duration: .85s; animation-timing-function: cubic-bezier(.65, 0, .25, 1); }
+::view-transition-group(device) { animation-duration: .9s; animation-timing-function: cubic-bezier(.5, 0, .1, 1); z-index: 5; }
+/* ida: a tela atual recua e escurece; a nova aparece por dentro da maçã, que cresce do centro */
+html.vt-page::view-transition-old(root) { animation: vt-dim .9s cubic-bezier(.65, 0, .25, 1) both; }
+html.vt-page::view-transition-new(root) {
+  -webkit-mask: url(../img/apple.svg) 50% 58% / 0 auto no-repeat; mask: url(../img/apple.svg) 50% 58% / 0 auto no-repeat;
+  animation: vt-iris .95s cubic-bezier(.7, 0, .2, 1) both; }
+/* volta: o produto se fecha para dentro da maçã e o catálogo reaparece por trás */
+html.vt-back::view-transition-old(root) { z-index: 2;
+  -webkit-mask: url(../img/apple.svg) 50% 58% / 340vmax auto no-repeat; mask: url(../img/apple.svg) 50% 58% / 340vmax auto no-repeat;
+  animation: vt-iris-close .85s cubic-bezier(.6, 0, .3, 1) both; }
+html.vt-back::view-transition-new(root) { animation: vt-undim .85s cubic-bezier(.3, 0, .2, 1) both; }
+@keyframes vt-iris { 0% { -webkit-mask-size: 0 auto; mask-size: 0 auto; } 38% { -webkit-mask-size: 22vmax auto; mask-size: 22vmax auto; } 100% { -webkit-mask-size: 340vmax auto; mask-size: 340vmax auto; } }
+@keyframes vt-iris-close { 0% { -webkit-mask-size: 340vmax auto; mask-size: 340vmax auto; } 62% { -webkit-mask-size: 22vmax auto; mask-size: 22vmax auto; } 100% { -webkit-mask-size: 0 auto; mask-size: 0 auto; } }
+@keyframes vt-dim { to { transform: scale(.94); filter: brightness(.3); } }
+@keyframes vt-undim { from { transform: scale(.94); filter: brightness(.3); } }
+/* filtros do catálogo: só os cartões deslizam */
+html.vt-filter::view-transition-group(*) { animation-duration: .55s; animation-timing-function: cubic-bezier(.3, 0, .2, 1); }
+html.vt-filter::view-transition-old(root), html.vt-filter::view-transition-new(root) { animation-duration: .3s; }
+
+/* ——— abertura da marca (uma vez por visita): logo cromado com brilho, e o site surge pela maçã ——— */
+.intro-curtain { display: none; }
+html.intro .hero { --intro: 1.35s; }
+html.intro .intro-curtain { display: grid; place-items: center; position: fixed; inset: 0; z-index: 300; background: #000; pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0), url(../img/apple.svg) 50% 58% / 0 auto no-repeat; -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0), url(../img/apple.svg) 50% 58% / 0 auto no-repeat; mask-composite: exclude;
+  animation: curtain-open 1s cubic-bezier(.7, 0, .2, 1) 1.15s both; }
+html.intro .intro-curtain i { display: block; width: min(64vw, 440px); aspect-ratio: 449.64 / 85.73;
+  background: linear-gradient(100deg, #8d9096 0%, #fff 18%, #8d9096 36%, #5d6066 46%, #f5f6f7 58%, #8d9096 72%, #fff 86%, #8d9096 100%) 100% 0 / 260% 100%;
+  -webkit-mask: url(../img/logo.svg) center / contain no-repeat; mask: url(../img/logo.svg) center / contain no-repeat;
+  animation: intro-logo 1.3s cubic-bezier(.2, .8, .2, 1) both, intro-shine 1.2s ease-in-out .15s both; }
+@keyframes intro-logo { 0% { opacity: 0; transform: scale(.94); filter: blur(8px); } 40% { opacity: 1; transform: none; filter: none; } 82% { opacity: 1; transform: scale(1.02); } 100% { opacity: 0; transform: scale(1.06); } }
+@keyframes intro-shine { to { background-position: 0 0; } }
+@keyframes curtain-open { 0% { -webkit-mask-size: 100% 100%, 0 auto; mask-size: 100% 100%, 0 auto; }
+  35% { -webkit-mask-size: 100% 100%, 20vmax auto; mask-size: 100% 100%, 20vmax auto; }
+  100% { -webkit-mask-size: 100% 100%, 340vmax auto; mask-size: 100% 100%, 340vmax auto; visibility: hidden; } }
+
+/* ——— página do produto: informações entram em sequência e a barra de compra sobe ——— */
+.pinfo.enter > * { animation: p-in .8s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 70ms + .35s); }
+.pinfo.enter > .buybar { animation: none; }
+@media (max-width: 899px) { .pinfo.enter > .buybar { animation: bar-up .7s cubic-bezier(.2, .8, .2, 1) .55s both; } }
+@keyframes p-in { from { opacity: 0; transform: translateY(22px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes bar-up { from { transform: translateY(110%); } to { transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  html.intro .intro-curtain { display: none; }
+  html.intro .hero { --intro: 0s; }
+}

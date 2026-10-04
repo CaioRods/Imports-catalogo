@@ -135,6 +135,16 @@ tools/textura/        gerador da textura de pedra
      - a ficha sobe para `interesses/<id>.jpg`;
      - o WhatsApp da loja abre com o relatório completo em texto e o link `https://importsbrasil.com/i/<código>/<id>`, cuja prévia mostra a ficha.
   4. Se o banco falhar, o WhatsApp abre mesmo assim, sem o link.
+- **Conta neste celular** (botão redondo no menu, com as iniciais):
+  - nome, telefone e e-mail ficam no `localStorage` (`imprts.cliente`), só no aparelho, sem senha e sem servidor;
+  - com conta salva, o "Tenho interesse" pula os dados e abre direto na ficha ("Enviando como… Alterar");
+  - "Sua conta" deixa alterar ou "Sair deste celular" (apaga os dados).
+- **Transições cinematográficas** (View Transitions; Chrome e Safari do iOS 18.2+; nos outros a página troca normal):
+  - abrir produto: a maçã do logo cresce do centro revelando a página e a foto do aparelho voa do cartão para a galeria;
+  - voltar ("‹ Catálogo" usa o histórico quando veio do catálogo): o produto se fecha na maçã e a foto volta para o cartão, na mesma rolagem;
+  - abertura da marca (1ª tela de cada visita): logo cromado com brilho e o site surge pela maçã; o topo espera (`--intro`);
+  - filtros: os cartões deslizam para o lugar novo;
+  - para a foto voar, a tela nova precisa nascer desenhada: o catálogo fica em cache na sessão (`imprts.vitrine`), o `app.js` tem `blocking="render"` e roda o `init` assim que executa (não espera o `DOMContentLoaded`). `html[data-vt]` guarda a última transição ("ida"/"volta").
 - **Limite do WhatsApp:** não existe como o site anexar uma imagem numa mensagem para um número específico. Por isso a ficha vai como link com prévia.
 - **Métricas** (`app.js`, bloco "métricas"):
   - o visitante é um id aleatório guardado no `localStorage`; a sessão fica no `sessionStorage`;

@@ -44,8 +44,12 @@
     const url = `${C.supabaseURL}/rest/v1/vitrine?select=*${query}`;
     const r = await fetch(url, { headers: { apikey: C.supabaseKey, Authorization: `Bearer ${C.supabaseKey}` } });
     if (!r.ok) throw new Error("vitrine " + r.status);
-    return r.json();
+    const data = await r.json();
+    if (query.startsWith("&order")) { try { sessionStorage.setItem(CACHE, JSON.stringify(data)); } catch {} }
+    return data;
   }
+  const CACHE = "imprts.vitrine";
+  const cached = () => { try { return JSON.parse(sessionStorage.getItem(CACHE)); } catch { return null; } };
 
   function wa(text) {
     if (!C.whatsapp) return null;
@@ -170,14 +174,15 @@
   setInterval(tickCountdowns, 1000);
 
   /* ——— página inicial ——— */
-  function card(p) {
+  function card(p, instant) {
     const imgs = images(p);
     const first = imgs[0];
     const days = (Date.now() - new Date(p.created_at)) / 864e5;
     const el = document.createElement("a");
-    el.className = "card reveal" + (p.vendido ? " sold" : "") + (promo(p) ? " on-promo" : "");
+    el.className = "card reveal" + (instant ? " in" : "") + (p.vendido ? " sold" : "") + (promo(p) ? " on-promo" : "");
     el.href = `produto.html?c=${p.code}`;
-    el.addEventListener("click", () => track("clique", { c: p.code }));
+    el.dataset.code = p.code;
+    el.addEventListener("click", () => { track("clique", { c: p.code }); flyFrom(p.code); });
     el.innerHTML = `
       <div class="pic"><img loading="lazy" decoding="async" class="${first.photo ? "photo" : ""}" src="${esc(first.src)}" alt="${esc(p.name)}"></div>
       <span class="code">${code(p.code)}</span>
@@ -209,13 +214,9 @@
       }, { passive: true });
     }
     const grid = $("#grid");
-    grid.innerHTML = '<div class="skeleton"></div>'.repeat(8);
-    let all = [];
-    try { all = await vitrine("&order=code.desc"); } catch (e) { grid.innerHTML = '<p class="empty">Não foi possível carregar o catálogo agora. Tente de novo em instantes.</p>'; return; }
-    countUp($("#count"), all.filter(p => !p.vendido).length);
-
+    let all = cached();
     let cat = "todos", q = "", sort = "novos";
-    const render = () => {
+    const render = instant => {
       let list = all.filter(p => cat === "todos" || (cat === "outros" ? !["iphone", "macbook", "drone"].includes(groupOf(p)) : groupOf(p) === cat));
       if (q) {
         const n = q.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
@@ -240,14 +241,24 @@
           h.innerHTML = `${esc(label)}${n ? `<span>${n} ${n > 1 ? "disponíveis" : "disponível"}</span>` : ""}`;
           grid.appendChild(h);
         }
-        items.forEach((p, i) => { const c = card(p); c.style.transitionDelay = `${Math.min(i % 8, 7) * 60}ms`; grid.appendChild(c); });
+        items.forEach((p, i) => { const c = card(p, instant); c.style.transitionDelay = `${Math.min(i % 8, 7) * 60}ms`; grid.appendChild(c); });
       }
+      if (instant) $$(".group-title", grid).forEach(h => h.classList.add("in"));
       revealOnScroll();
     };
-    $$(".chip").forEach(b => b.addEventListener("click", () => { $$(".chip").forEach(x => x.classList.remove("on")); b.classList.add("on"); cat = b.dataset.cat; render(); }));
-    $("#q").addEventListener("input", e => { q = e.target.value.trim(); render(); });
-    $("#sort").addEventListener("change", e => { sort = e.target.value; render(); });
-    render();
+    $$(".chip").forEach(b => b.addEventListener("click", () => { $$(".chip").forEach(x => x.classList.remove("on")); b.classList.add("on"); cat = b.dataset.cat; reflow(() => render(true)); }));
+    $("#q").addEventListener("input", e => { q = e.target.value.trim(); render(true); });
+    $("#sort").addEventListener("change", e => { sort = e.target.value; reflow(() => render(true)); });
+    if (all) {
+      // volta de um produto / segunda visita: catálogo na hora (a rolagem volta para onde estava)
+      $("#count").textContent = all.filter(p => !p.vendido).length;
+      render(true);
+    } else grid.innerHTML = '<div class="skeleton"></div>'.repeat(8);
+    try {
+      const fresh = await vitrine("&order=code.desc");
+      if (!all) { all = fresh; countUp($("#count"), all.filter(p => !p.vendido).length); render(); }
+      else if (JSON.stringify(fresh) !== JSON.stringify(all)) { all = fresh; $("#count").textContent = all.filter(p => !p.vendido).length; render(true); }
+    } catch (e) { if (!all) { grid.innerHTML = '<p class="empty">Não foi possível carregar o catálogo agora. Tente de novo em instantes.</p>'; return; } }
     // atualiza sozinho (venda feita na loja some/aparece "Vendido")
     // (só com a aba visível e só redesenha se algo mudou, para a grade não piscar)
     setInterval(async () => {
@@ -255,7 +266,7 @@
       try {
         const fresh = await vitrine("&order=code.desc");
         if (JSON.stringify(fresh) === JSON.stringify(all)) return;
-        all = fresh; $("#count").textContent = all.filter(p => !p.vendido).length; render();
+        all = fresh; $("#count").textContent = all.filter(p => !p.vendido).length; render(true);
       } catch {}
     }, 60000);
   }
@@ -265,9 +276,18 @@
     navShadow();
     const c = new URLSearchParams(location.search).get("c");
     const root = $("#product");
+    const hit = (cached() || []).find(x => String(x.code) === c);
+    if (hit) show(hit, true);
     let p;
     try { [p] = await vitrine(`&code=eq.${encodeURIComponent(c)}`); } catch {}
-    if (!p) { root.innerHTML = '<p class="empty">Produto não encontrado. <a href="./#catalogo" style="text-decoration:underline">Ver o catálogo</a></p>'; return; }
+    if (!p && !hit) { root.innerHTML = '<p class="empty">Produto não encontrado. <a href="./#catalogo" style="text-decoration:underline">Ver o catálogo</a></p>'; return; }
+    if (p && (!hit || JSON.stringify(p) !== JSON.stringify(hit))) show(p, !hit);
+    p = p || hit;
+    track("produto", { c: p.code });
+  }
+
+  function show(p, first) {
+    const root = $("#product");
     document.title = `${p.name} · Imports Brasil`;
     const imgs = images(p);
     const parts = Object.entries(p.parts || {});
@@ -283,11 +303,11 @@
       <a class="back" href="./#catalogo">‹ Catálogo</a>
       <div class="product-grid">
         <div class="gallery">
-          <div class="slides">${imgs.map(i => `<div class="slide"><img class="${i.photo ? "photo" : ""}" src="${esc(i.src)}" alt="${esc(p.name)}"></div>`).join("")}</div>
+          <div class="slides">${imgs.map((i, k) => `<div class="slide"><img class="${i.photo ? "photo" : ""}" src="${esc(i.src)}" alt="${esc(p.name)}"${k ? "" : ' style="view-transition-name:device"'}></div>`).join("")}</div>
           <div class="dots">${imgs.length > 1 ? imgs.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("") : ""}</div>
           <div class="thumbs">${imgs.length > 1 ? imgs.map((i, k) => `<button class="${k ? "" : "on"}"><img class="${i.photo ? "" : "official"}" src="${esc(i.src)}" alt=""></button>`).join("") : ""}</div>
         </div>
-        <div class="pinfo">
+        <div class="pinfo${first ? " enter" : ""}">
           ${p.vendido ? '<span class="status" style="color:var(--dim)"><i></i>Vendido</span>' : '<span class="status"><i></i>Disponível na loja</span>'}
           <h1>${esc(p.name)}</h1>
           ${promo(p) ? `<div class="promo-head"><span class="badge-promo">Promoção</span>${p.promo_until ? `<span class="countdown" data-until="${esc(p.promo_until)}">Termina em <b>${left(p.promo_until)}</b></span>` : ""}</div>` : ""}
@@ -306,7 +326,12 @@
       </div>`;
     renderSeals();
     pageCode = p.code;
-    track("produto", { c: p.code });
+    $$(".pinfo.enter > *", root).forEach((el, i) => el.style.setProperty("--i", i));
+    // "‹ Catálogo": se veio do catálogo, volta pelo histórico (mesma rolagem e a foto volta para o cartão)
+    $(".back", root).addEventListener("click", e => {
+      let from = null; try { from = new URL(document.referrer); } catch {}
+      if (from && from.origin === location.origin && /^\/(index(\.html)?)?$/.test(from.pathname) && history.length > 1) { e.preventDefault(); history.back(); }
+    });
     $$(".want", root).forEach(b => b.addEventListener("click", () => want(p, b)));
     // galeria: pontos e miniaturas acompanham o deslize
     const slides = $(".slides", root);
@@ -318,6 +343,43 @@
     }, { passive: true });
     thumbs.forEach((t, k) => t.addEventListener("click", () => slides.scrollTo({ left: k * slides.clientWidth, behavior: "smooth" })));
     $$("img", root).forEach(img => img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = 1; img.src = "img/placeholder.png"; } });
+  }
+
+  /* ——— transições (View Transitions: a maçã do logo abre a próxima tela; sem suporte, troca normal) ——— */
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // a foto do aparelho "voa" do cartão para a galeria (e volta): só ela leva o nome "device"
+  function flyFrom(c) {
+    $$(".card .pic img").forEach(i => { i.style.viewTransitionName = ""; });
+    const img = $(`.card[data-code="${c}"] .pic img`);
+    if (img) img.style.viewTransitionName = "device";
+  }
+  // saindo: lembra de onde veio e qual aparelho estava aberto
+  addEventListener("pageswap", e => {
+    if (!e.viewTransition) return;
+    try { sessionStorage.setItem("imprts.vt", JSON.stringify({ from: document.body.dataset.page, code: pageCode })); } catch {}
+  });
+  // chegando: ida (a maçã abre) ou volta do produto para o catálogo (a maçã fecha)
+  addEventListener("pagereveal", e => {
+    let prev = null;
+    try { prev = JSON.parse(sessionStorage.getItem("imprts.vt")); sessionStorage.removeItem("imprts.vt"); } catch {}
+    if (!e.viewTransition) return;
+    const back = document.body.dataset.page === "home" && prev && prev.from === "product";
+    if (back && prev.code != null) flyFrom(prev.code);
+    const html = document.documentElement;
+    html.classList.add(back ? "vt-back" : "vt-page");
+    html.dataset.vt = back ? "volta" : "ida"; // última transição (ajuda a conferir)
+    e.viewTransition.ready.catch(() => {}); // o navegador pode desistir (aba em segundo plano): troca normal
+    e.viewTransition.finished.finally(() => html.classList.remove("vt-back", "vt-page"));
+  });
+  // filtros/ordem: os cartões deslizam para o lugar novo
+  function reflow(update) {
+    if (!document.startViewTransition || calm) return update();
+    const html = document.documentElement;
+    const name = () => $$("#grid .card").forEach(c => { c.style.viewTransitionName = "k" + c.dataset.code; });
+    name(); html.classList.add("vt-filter");
+    const t = document.startViewTransition(() => { update(); name(); });
+    t.ready.catch(() => {});
+    t.finished.finally(() => { html.classList.remove("vt-filter"); $$("#grid .card").forEach(c => { c.style.viewTransitionName = ""; }); });
   }
 
   /* ——— "Tenho interesse" e a conta (o formulário só carrega no primeiro toque) ——— */
@@ -362,7 +424,9 @@
     $$("[data-year]").forEach(s => s.textContent = new Date().getFullYear());
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  // roda assim que o script executa (já com a página lida): a tela nasce desenhada com o cache,
+  // e a transição entre telas captura o aparelho no lugar certo
+  const init = () => {
     contacts();
     contaBtn();
     $$("[data-conta]").forEach(b => b.addEventListener("click", () => withForm(b, f => f.account())));
@@ -370,5 +434,6 @@
     renderSeals();
     if (document.body.dataset.page === "home") home();
     if (document.body.dataset.page === "product") product();
-  });
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
