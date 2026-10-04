@@ -35,3 +35,25 @@ where p.publish = true
   and (p.status <> 'vendido' or p.sold_at > now() - interval '7 days');
 
 grant select on public.vitrine to anon, authenticated;
+
+-- 4. Promoção (preço promocional com prazo opcional)
+alter table public.products add column if not exists promo_price numeric;
+alter table public.products add column if not exists promo_until timestamptz;
+
+drop view if exists public.vitrine;
+create view public.vitrine as
+select p.id, p.code, p.category, p.model_id, p.color_id, p.name, p.storage, p.ram, p.chip,
+       p.battery_health, p.condition, p.parts, p.price,
+       (p.status = 'vendido') as vendido, p.status, p.created_at, p.updated_at, p.sold_at,
+       p.description, p.photos, p.cover,
+       case when p.promo_price is not null and (p.promo_until is null or p.promo_until > now())
+            then p.promo_price end as promo_price,
+       case when p.promo_price is not null and (p.promo_until is null or p.promo_until > now())
+            then p.promo_until end as promo_until,
+       (p.promo_price is not null and (p.promo_until is null or p.promo_until > now())) as promocao
+from public.products p
+where p.publish = true
+  and coalesce(p.deleted, false) = false
+  and (p.status <> 'vendido' or p.sold_at > now() - interval '7 days');
+
+grant select on public.vitrine to anon, authenticated;

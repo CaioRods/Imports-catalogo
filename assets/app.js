@@ -97,24 +97,90 @@
     requestAnimationFrame(step);
   }
 
+  /* ——— métricas (o que o painel Clientes do sistema mostra) ——— */
+  const rid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+  const store = (s, k) => { try { let v = s.getItem(k); if (!v) s.setItem(k, v = rid()); return v; } catch { return rid(); } };
+  const visitor = store(localStorage, "imprts.v"), session = store(sessionStorage, "imprts.s");
+  const base = { v: visitor, s: session, d: matchMedia("(pointer: coarse)").matches ? "celular" : "computador" };
+  const queue = [];
+  const trackURL = `${C.supabaseURL}/rest/v1/rpc/site_track`;
+  const track = (k, extra = {}) => { queue.push({ ...base, k, ...extra }); if (queue.length >= 25) flush(); };
+  function flush(leaving) {
+    if (!queue.length) return;
+    const body = JSON.stringify(queue.splice(0, 60));
+    if (leaving && navigator.sendBeacon) { navigator.sendBeacon(`${trackURL}?apikey=${C.supabaseKey}`, new Blob([body], { type: "text/plain" })); return; }
+    fetch(trackURL, { method: "POST", headers: { apikey: C.supabaseKey, Authorization: `Bearer ${C.supabaseKey}`, "Content-Type": "text/plain" }, body }).catch(() => {});
+  }
+  setInterval(flush, 15000);
+  // tempo com a página visível (para no fundo; conta de novo ao voltar)
+  let pageCode = null, shownAt = document.hidden ? null : Date.now();
+  function spent() {
+    if (shownAt == null) return;
+    const t = Math.round((Date.now() - shownAt) / 1000);
+    shownAt = null;
+    if (t >= 2) track("tempo", { c: pageCode, t });
+  }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) { spent(); flush(true); } else shownAt = Date.now(); });
+  addEventListener("pagehide", () => { spent(); flush(true); });
+  function referrer() {
+    const u = new URLSearchParams(location.search).get("utm_source");
+    if (u) return u.toLowerCase();
+    try {
+      const h = new URL(document.referrer).hostname.replace(/^(www|l|m|lm)\./, "");
+      if (!h || h === location.hostname) return "";
+      return /instagram/.test(h) ? "instagram" : /facebook|fb\./.test(h) ? "facebook" : /google/.test(h) ? "google" : /whatsapp|wa\.me/.test(h) ? "whatsapp" : h;
+    } catch { return ""; }
+  }
+  function visit() {
+    try { if (sessionStorage.getItem("imprts.visit")) return; sessionStorage.setItem("imprts.visit", 1); } catch {}
+    track("visita", { r: referrer() });
+  }
+
+  /* ——— promoção ——— */
+  // A vitrine já zera a promoção vencida; a checagem aqui cobre quem deixou a página aberta.
+  const now = p => promo(p) ? p.promo_price : p.price; // preço que vale agora
+  const promo = p => !!(!p.vendido && p.promocao && p.promo_price != null && (!p.promo_until || new Date(p.promo_until) > Date.now()));
+  function left(until) {
+    const ms = new Date(until) - Date.now();
+    if (ms <= 0) return "Encerrada";
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
+    const two = n => String(n).padStart(2, "0");
+    return d ? `${d}d ${h}h ${two(m)}m` : `${two(h)}:${two(m)}:${two(s)}`;
+  }
+  function priceHTML(p) {
+    if (!promo(p)) return `<div class="price">${money(p.price)}</div>`;
+    const off = p.price ? Math.round((1 - p.promo_price / p.price) * 100) : 0;
+    return `<div class="price promo">${p.price ? `<s>${money(p.price)}</s>` : ""}<span>${money(p.promo_price)}</span>${off > 0 ? `<em>-${off}%</em>` : ""}</div>`;
+  }
+  function tickCountdowns() {
+    document.querySelectorAll("[data-until]").forEach(el => {
+      const t = left(el.dataset.until);
+      if (t === "Encerrada" && !el.dataset.done) { el.dataset.done = 1; setTimeout(() => location.reload(), 1500); }
+      el.querySelector("b").textContent = t;
+    });
+  }
+  setInterval(tickCountdowns, 1000);
+
   /* ——— página inicial ——— */
   function card(p) {
     const imgs = images(p);
     const first = imgs[0];
     const days = (Date.now() - new Date(p.created_at)) / 864e5;
     const el = document.createElement("a");
-    el.className = "card reveal" + (p.vendido ? " sold" : "");
+    el.className = "card reveal" + (p.vendido ? " sold" : "") + (promo(p) ? " on-promo" : "");
     el.href = `produto.html?c=${p.code}`;
+    el.addEventListener("click", () => track("clique", { c: p.code }));
     el.innerHTML = `
       <div class="pic"><img loading="lazy" decoding="async" class="${first.photo ? "photo" : ""}" src="${esc(first.src)}" alt="${esc(p.name)}"></div>
       <span class="code">${code(p.code)}</span>
-      ${!p.vendido && days < 7 ? '<span class="badge-new">Novo</span>' : ""}
+      ${promo(p) ? '<span class="badge-promo">Promoção</span>' : !p.vendido && days < 7 ? '<span class="badge-new">Novo</span>' : ""}
       ${p.vendido ? '<span class="sold-tag">VENDIDO</span>' : ""}
       <div class="info">
         <div class="name">${esc(p.name)}</div>
         <div class="tags">${p.storage ? `<span class="tag">${esc(p.storage)}</span>` : ""}<span class="tag">${esc(CONDITION[p.condition] || "")}</span></div>
-        ${p.battery_health ? `<div class="batt ${p.battery_health < 80 ? "low" : p.battery_health < 88 ? "mid" : ""}"><b><i style="width:${Math.max(8, Math.min(100, p.battery_health)) * .17}px"></i></b>Bateria ${p.battery_health}%</div>` : ""}
-        <div class="price">${money(p.price)}</div>
+        ${p.battery_health ? `<div class="batt ${p.battery_health <= 65 ? "low" : p.battery_health < 80 ? "mid" : ""}"><b><i style="width:${Math.max(8, Math.min(100, p.battery_health)) * .17}px"></i></b>Bateria ${p.battery_health}%</div>` : ""}
+        ${priceHTML(p)}
+        ${promo(p) && p.promo_until ? `<div class="countdown" data-until="${esc(p.promo_until)}">Termina em <b>${left(p.promo_until)}</b></div>` : ""}
       </div>`;
     el.addEventListener("pointermove", e => { const r = el.getBoundingClientRect(); el.style.setProperty("--mx", (e.clientX - r.left) + "px"); el.style.setProperty("--my", (e.clientY - r.top) + "px"); });
     const img = $("img", el);
@@ -148,10 +214,10 @@
         list = list.filter(p => `${p.name} ${code(p.code)} ${p.storage || ""}`.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().includes(n));
       }
       const sorters = {
-        novos: (a, b) => (a.vendido - b.vendido) || (b.code - a.code),
-        menor: (a, b) => (a.vendido - b.vendido) || ((a.price ?? 1e12) - (b.price ?? 1e12)),
-        maior: (a, b) => (a.vendido - b.vendido) || ((b.price ?? 0) - (a.price ?? 0)),
-        bateria: (a, b) => (a.vendido - b.vendido) || ((b.battery_health ?? 0) - (a.battery_health ?? 0)),
+        novos: (a, b) => (a.vendido - b.vendido) || (promo(b) - promo(a)) || (b.code - a.code),
+        menor: (a, b) => (a.vendido - b.vendido) || (promo(b) - promo(a)) || ((now(a) ?? 1e12) - (now(b) ?? 1e12)),
+        maior: (a, b) => (a.vendido - b.vendido) || (promo(b) - promo(a)) || ((now(b) ?? 0) - (now(a) ?? 0)),
+        bateria: (a, b) => (a.vendido - b.vendido) || (promo(b) - promo(a)) || ((b.battery_health ?? 0) - (a.battery_health ?? 0)),
       };
       list.sort(sorters[sort]);
       grid.innerHTML = "";
@@ -182,12 +248,10 @@
       ["Condição", CONDITION[p.condition]],
       ["Armazenamento", p.storage],
       ["Chip", p.chip], ["Memória", p.ram],
-      ["Saúde da bateria", p.battery_health ? `<span class="batt ${p.battery_health < 80 ? "low" : p.battery_health < 88 ? "mid" : ""}" style="margin:0;justify-content:flex-end"><b><i style="width:${Math.max(8, Math.min(100, p.battery_health)) * .17}px"></i></b>${p.battery_health}%</span>` : null],
+      ["Saúde da bateria", p.battery_health ? `<span class="batt ${p.battery_health <= 65 ? "low" : p.battery_health < 80 ? "mid" : ""}" style="margin:0;justify-content:flex-end"><b><i style="width:${Math.max(8, Math.min(100, p.battery_health)) * .17}px"></i></b>${p.battery_health}%</span>` : null],
       ["Categoria", CATEGORY[p.category]],
       ["Código", code(p.code)],
     ].filter(([, v]) => v);
-    const msg = `Olá! Tenho interesse no ${p.name} (código ${code(p.code)}) que vi no site.`;
-    const link = wa(msg);
     root.innerHTML = `
       <a class="back" href="./#catalogo">‹ Catálogo</a>
       <div class="product-grid">
@@ -199,10 +263,11 @@
         <div class="pinfo">
           ${p.vendido ? '<span class="status" style="color:var(--dim)"><i></i>Vendido</span>' : '<span class="status"><i></i>Disponível na loja</span>'}
           <h1>${esc(p.name)}</h1>
-          <div class="price">${money(p.price)}</div>
+          ${promo(p) ? `<div class="promo-head"><span class="badge-promo">Promoção</span>${p.promo_until ? `<span class="countdown" data-until="${esc(p.promo_until)}">Termina em <b>${left(p.promo_until)}</b></span>` : ""}</div>` : ""}
+          ${priceHTML(p)}
           <div class="buybar">
-            <div class="p">${money(p.price)}</div>
-            ${link && !p.vendido ? `<a class="btn wa" href="${link}" target="_blank" rel="noopener">${waIcon()} Comprar pelo WhatsApp</a>` : ""}
+            <div class="p">${money(now(p))}</div>
+            ${!p.vendido ? `<button class="btn wa want">${waIcon()} Tenho interesse</button>` : ""}
           </div>
           <div class="badges pbadges">${["iphone", "android"].includes(p.category) ? '<i data-seal="assist"></i>' : ""}${p.battery_health ? '<i data-seal="bateria"></i>' : ""}<i data-seal="pecas"></i></div>
           ${p.description ? `<h3 class="kicker" style="margin-top:34px">Sobre este aparelho</h3><div class="desc">${esc(p.description)}</div>` : ""}
@@ -213,6 +278,9 @@
         </div>
       </div>`;
     renderSeals();
+    pageCode = p.code;
+    track("produto", { c: p.code });
+    $$(".want", root).forEach(b => b.addEventListener("click", () => want(p, b)));
     // galeria: pontos e miniaturas acompanham o deslize
     const slides = $(".slides", root);
     const dots = $$(".dots i", root), thumbs = $$(".thumbs button", root);
@@ -225,9 +293,27 @@
     $$("img", root).forEach(img => img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = 1; img.src = "img/placeholder.png"; } });
   }
 
+  /* ——— "Tenho interesse" (o formulário só carrega no primeiro toque) ——— */
+  let interesse;
+  function want(p, b) {
+    if (window.IMPRTS_INTERESSE) return window.IMPRTS_INTERESSE.open(p);
+    b.classList.add("busy");
+    interesse = interesse || new Promise((ok, no) => {
+      const s = document.createElement("script");
+      s.src = "assets/interesse.js?v=" + (document.querySelector('script[src*="app.js"]')?.src.split("v=")[1] || "1");
+      s.onload = ok; s.onerror = no;
+      document.head.appendChild(s);
+    });
+    interesse.then(() => { b.classList.remove("busy"); window.IMPRTS_INTERESSE.open(p); }).catch(() => { b.classList.remove("busy"); interesse = null; });
+  }
+  window.IMPRTS_UI = { money, esc, code, images, promo, now, wa, waIcon, flush, visitor, CONDITION, PARTS };
+
   function contacts() {
     $$("[data-wa]").forEach(a => { const l = wa("Olá! Vim pelo site da IMPRTS."); if (l) a.href = l; else a.style.display = "none"; });
-    $$("[data-ig]").forEach(a => { if (C.instagram) { a.href = `https://instagram.com/${C.instagram}`; a.textContent = "@" + C.instagram; } else a.style.display = "none"; });
+    $$("[data-igs]").forEach(box => {
+      box.innerHTML = (C.instagrams || []).map(u => `<a href="https://instagram.com/${esc(u)}" target="_blank" rel="noopener">@${esc(u)}</a>`).join("");
+    });
+    $$("[data-wa-label]").forEach(a => { if (C.whatsappLabel) a.textContent = "WhatsApp " + C.whatsappLabel; });
     $$("[data-addr]").forEach(a => { if (C.endereco) a.textContent = C.endereco; else a.style.display = "none"; });
     $$("[data-wa-icon]").forEach(s => s.innerHTML = waIcon());
     $$("[data-year]").forEach(s => s.textContent = new Date().getFullYear());
@@ -235,6 +321,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     contacts();
+    visit();
     renderSeals();
     if (document.body.dataset.page === "home") home();
     if (document.body.dataset.page === "product") product();

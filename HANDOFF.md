@@ -29,12 +29,13 @@ Os dois compartilham o mesmo banco: **Supabase**, projeto `evaeprbbctemcnltjuwn`
   - iPhones: **foto oficial da Apple** para todas as cores (iPhone 8 → 18 Pro Max, Air, Duo, 17e).
   - MacBooks: **foto oficial da Apple** do Air 2018 em diante, Pro com Touch Bar, Pro 14/16 (todas as gerações), Neo. Os MacBooks de **2015–2017** não existem mais no banco de imagens da Apple → usam **render 3D do próprio sistema**.
   - Drones DJI Avata / Avata 2 / Avata 360: **foto oficial da DJI**.
-- No sistema (app de Mac), já programado mas **NÃO publicado** para as lojas: bloco **"No site"** no cadastro do produto — descrição para o cliente + várias fotos reais + escolha da capa (por padrão a capa é a foto oficial padronizada).
+- No sistema (app de Mac), já programado mas **NÃO publicado** para as lojas: bloco **"No site"** no cadastro do produto — descrição para o cliente + até **4 fotos reais** (total de 5 com a **capa oficial, que é fixa** e sempre a 1ª). Cada foto passa pelo recorte (`Sources/Screens/PhotoCropSheet.swift`: quadrado, arrastar para posicionar, zoom por barra/roda/pinça, sai JPEG 1600×1600) antes de subir para a pasta `produtos`.
+- **Promoção** (botão "Promoção" ao lado do preço no cadastro): preço promocional + prazo (Sem prazo, 24 horas, 3 dias, 7 dias ou data/hora escolhida). Campos `promo_price` e `promo_until` em `products`; a view `vitrine` só devolve a promoção enquanto vale (`promocao = true`). No site: produto em promoção vem **sempre primeiro** em qualquer ordenação, cartão com borda dourada e etiqueta "Promoção", preço antigo riscado, preço novo em destaque com "-X%", e contagem regressiva "Termina em …" (cartão e página do produto; ao zerar, a página recarrega).
 
 ### Falta (em ordem)
-1. **Banco:** aplicar `supabase/site.sql` no projeto `evaeprbbctemcnltjuwn` (cria `description`, `photos`, `cover` em `products`, a pasta pública de fotos `produtos` e recria a view `vitrine` com esses campos).
+1. **Banco:** aplicar `supabase/site.sql` no projeto `evaeprbbctemcnltjuwn` (cria `description`, `photos`, `cover`, `promo_price`, `promo_until` em `products`, a pasta pública de fotos `produtos` e recria a view `vitrine` com esses campos e o `promocao`).
    - A conta do Supabase conectada ao assistente era outra (não tinha esse projeto). Precisa conectar a conta dona do projeto **ou** colar o SQL no SQL Editor do painel do Supabase.
-2. **Só depois do passo 1:** publicar a versão nova do sistema (`./release.sh 1.20 "Site: descrição e fotos no cadastro"` dentro de `~/Documents/IMPRTS`). **Nunca publique antes**: o app passa a enviar as colunas novas e, se elas não existirem no banco, a sincronização de todos os Macs para.
+2. **Só depois do passo 1:** publicar a versão nova do sistema (`./release.sh 1.20 "Site: fotos com recorte e promoções"` dentro de `~/Documents/IMPRTS`). **Nunca publique antes**: o app passa a enviar as colunas novas e, se elas não existirem no banco, a sincronização de todos os Macs para.
 3. **Vercel:** publicar este repositório (é estático, sem build). O Caio começou `npx vercel login`. Depois: `npx vercel deploy --prod` na raiz deste repo.
    - Se o endereço final for diferente de `https://imprts.vercel.app`, trocar a constante `SitePhotos.siteURL` em `Sources/Data/SitePhotos.swift` do sistema (o app busca a capa oficial no site).
 4. **Contatos da loja** em `assets/config.js`: `whatsapp` (só números, com 55 + DDD), `instagram` (sem @), `endereco`, `cidade`. Sem o WhatsApp, o botão "Comprar pelo WhatsApp" não aparece.
@@ -98,7 +99,7 @@ HANDOFF.md            este arquivo
 - **Selos IMPRTS** (no fim da página e na página de produto): horizontais e simples — emblema metálico serrilhado com ícone + título + uma linha. No celular ficam **lado a lado** (2 por linha), menores. Código em `app.js` (`SEALS`, `emblem()`, `sealBadge()`), CSS `.badge`.
   - **IMPRTS Assistance** (dourado): todo celular comprado na IMPRTS tem **3 meses de assistência sem cobrar mão de obra** (informação do Caio).
   - Bateria certificada, Peças verificadas, Estoque real: só afirmam o que o sistema realmente faz. O Caio disse que a loja tem "outros selos de certificação" — **perguntar quais** antes de criar novos; não inventar prazos (a garantia padrão não está definida).
-- Cartão de produto: capa sobre brilho radial, código no canto (`000`), selo "Novo" (< 7 dias), etiquetas (capacidade, condição), barra de bateria colorida (verde ≥ 88%, âmbar ≥ 80%, vermelho abaixo), preço.
+- Cartão de produto: capa sobre brilho radial, código no canto (`000`), selo "Novo" (< 7 dias), etiquetas (capacidade, condição), barra de bateria colorida (**verde 80% ou mais, amarelo 66–79%, vermelho 65% ou menos** — regra do Caio, vale também no sistema), preço.
 - **Não inventar informação da loja**: nada de "parcelamos em 12×", "entregamos em todo o Brasil" etc. sem o Caio confirmar.
 
 ## 6. Capas padronizadas (fotos oficiais)
@@ -151,3 +152,14 @@ Código em `~/Documents/IMPRTS` (projeto **XcodeGen**: `project.yml` → `xcodeg
 - Aplicar `site.sql` e publicar a versão do sistema com fotos/descrição.
 - Preencher contatos em `assets/config.js`.
 - Possíveis melhorias: página por categoria, compartilhamento do produto (Open Graph por produto exige servidor/edge), PWA, filtro por faixa de preço, comparação entre aparelhos.
+
+## Contato, "Tenho interesse" e painel Clientes (out/2026)
+
+- **Contato** (`assets/config.js`): WhatsApp da loja `5518998126640` ((18) 99812-6640), Instagram dos donos `rvrodriguess` e `caio.riguess`. `site` = endereço do site no ar (preencher depois do deploy na Vercel).
+- **Rodapé:** "© IMPRTS. Todos os direitos reservados." + assinatura **CRdevs** (branca, "CR" bem grosso) que leva ao Instagram `caio.riguess`.
+- **Tenho interesse** (página do produto, `assets/interesse.js`, carregado só no primeiro toque): nome completo + telefone (obrigatórios) + Gmail opcional → prévia da **ficha** (imagem 1080×1350 desenhada em canvas: pedra, logo metálico, foto, preço/promoção, condição, bateria colorida, peças, IMPRTS Assistance, dados do cliente) → "Confirmar e enviar": registra em `leads` (função `site_lead`), sobe a ficha em `interesses/<id>.jpg` e abre o WhatsApp da loja com o relatório em texto + link da ficha. Se o banco falhar, o WhatsApp abre mesmo assim (sem o link).
+- **Link da ficha:** `/i/<código>/<id>` → `api/ficha.js` (função da Vercel) com `og:image` = a ficha (aparece na prévia do WhatsApp) e redireciona ao produto.
+- **Métricas** (em `app.js`): visitante (id aleatório no navegador), visita, produto aberto, clique no catálogo e tempo com a página visível; enviados em lote para `site_track` (texto puro, sai até ao fechar a página).
+- **Banco:** `supabase/clientes.sql` (tabelas `site_events` e `leads`, funções `site_track`, `site_lead`, `site_stats`, pasta `interesses`). O site só escreve pelas funções; ler é só para os Macs da loja.
+- **Sistema:** tela **Clientes** (`Sources/Screens/ClientsPage.swift`): visitantes, produtos abertos, tempo médio, interessados, % celular, ranking dos mais vistos, visitas por dia, origem (Instagram, direto…), e a lista de interessados com o produto, o que mais viram, tempo no site, andamento (Novo, Contatado, Vendido, Perdido) e botão de WhatsApp.
+- **Ajustes → Visual dos aparelhos:** 3D, 2D (desenho) ou Fotos (as capas do catálogo, baixadas do repositório do site pela CDN jsDelivr e guardadas no Mac; sem foto → 2D).

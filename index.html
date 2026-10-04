@@ -15,9 +15,9 @@
 <link rel="preload" as="image" href="img/pedra-m.webp" media="(max-width: 720px)">
 <link rel="preload" as="image" href="img/pedra.webp" media="(min-width: 721px)">
 <link rel="apple-touch-icon" href="img/icon.png">
-<link rel="stylesheet" href="assets/style.css?v=1791053526">
-<script src="assets/config.js?v=1791053526"></script>
-<script src="assets/app.js?v=1791053526" defer></script>
+<link rel="stylesheet" href="assets/style.css?v=1791081404">
+<script src="assets/config.js?v=1791081404"></script>
+<script src="assets/app.js?v=1791081404" defer></script>
 </head>
 <body data-page="home">
 <div class="cave" aria-hidden="true"><div class="cave-light"></div></div>
@@ -140,11 +140,12 @@
       <div>iPhone, Mac e assistência técnica.</div>
       <div data-addr></div></div>
     <div style="display:flex;flex-direction:column;gap:10px">
-      <a data-wa href="#">WhatsApp</a>
-      <a data-ig href="#" target="_blank" rel="noopener">Instagram</a>
+      <a data-wa data-wa-label href="#">WhatsApp</a>
+      <div class="igs" data-igs></div>
     </div>
-    <div style="color:var(--faint)">© <span data-year></span> IMPRTS · Estoque atualizado em tempo real pelo sistema da loja.</div>
+    <div class="legal">© <span data-year></span> IMPRTS. Todos os direitos reservados.<br>Estoque atualizado em tempo real pelo sistema da loja.</div>
   </div>
+  <a class="crdevs" href="https://instagram.com/caio.riguess" target="_blank" rel="noopener" aria-label="Desenvolvido por CRdevs — Instagram @caio.riguess"><span>desenvolvido por</span><b>CR</b><i>devs</i></a>
 </footer>
 </body>
 </html>
