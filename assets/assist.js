@@ -1,5 +1,5 @@
-/* IMPRTS Assistência — tema claro/escuro e o montador de orçamento
-   (busca do iPhone com foto → problemas → detalhes → relatório no WhatsApp da IMPRTS Assistência). */
+/* IMPORTS Assistência — tema claro/escuro e o montador de orçamento
+   (busca do iPhone com foto → problemas → detalhes → relatório no WhatsApp da IMPORTS Assistência). */
 (() => {
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];

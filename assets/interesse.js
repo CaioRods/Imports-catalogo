@@ -1,4 +1,4 @@
-/* IMPRTS — "Tenho interesse": dados do cliente → ficha (imagem) → registro no sistema → WhatsApp da loja.
+/* IMPORTS — "Tenho interesse": dados do cliente → ficha (imagem) → registro no sistema → WhatsApp da loja.
    Carregado só quando o cliente toca no botão (não pesa no catálogo). */
 (() => {
   const C = window.IMPRTS;
@@ -62,7 +62,7 @@
     g.addColorStop(0, "rgba(255,255,255,.13)"); g.addColorStop(.45, "rgba(0,0,0,.35)"); g.addColorStop(1, "rgba(0,0,0,.92)");
     x.fillStyle = g; x.fillRect(0, 0, W, H);
 
-    // logo IMPRTS metálico
+    // logo IMPORTS metálico
     const d = document.querySelector("svg.logo path")?.getAttribute("d");
     if (d) {
       const lw = 300, s = lw / 449.64;
@@ -137,7 +137,7 @@
     y += 112;
     if (["iphone", "android"].includes(p.category)) {
       x.font = `600 23px ${F}`; x.fillStyle = "#ffc35a";
-      x.fillText("IMPRTS Assistance · 3 meses de assistência sem custo de mão de obra", W / 2, y + 44);
+      x.fillText("IMPORTS Assistance · 3 meses de assistência sem custo de mão de obra", W / 2, y + 44);
     }
 
     // cliente
@@ -177,7 +177,7 @@
   function message(p, client, link) {
     const parts = Object.entries(p.parts || {});
     const lines = [
-      "Olá, IMPRTS! Tenho interesse neste aparelho que vi no site:",
+      "Olá, IMPORTS! Tenho interesse neste aparelho que vi no site:",
       "",
       `*${p.name}*`,
       `Código: ${code(p.code)}`,
@@ -246,7 +246,7 @@
         <p class="sheet-err" hidden></p>
         <button class="btn metal save">Salvar</button>
         ${s ? '<button class="btn forget">Sair deste celular</button>' : ""}
-        <p class="sheet-note">Seus dados são usados só pela IMPRTS para falar com você.</p>
+        <p class="sheet-note">Seus dados são usados só pela IMPORTS para falar com você.</p>
       </div>`);
     if (!s) setTimeout(() => f("name").focus(), 350);
     $(".save", el).onclick = () => {
@@ -264,15 +264,15 @@
     const { el, close, f, read, err } = sheet(`
         <div class="sh-step s1"${s ? " hidden" : ""}>
           <h2 id="sheet-t">Tenho interesse</h2>
-          <p class="sheet-sub">Deixe seus dados e a IMPRTS recebe a ficha completa do <b>${esc(p.name)}</b> no WhatsApp. Eles ficam guardados neste celular para as próximas vezes.</p>
+          <p class="sheet-sub">Deixe seus dados e a IMPORTS recebe a ficha completa do <b>${esc(p.name)}</b> no WhatsApp. Eles ficam guardados neste celular para as próximas vezes.</p>
           ${fields(s || saved())}
           <p class="sheet-err" hidden></p>
           <button class="btn metal go">Continuar</button>
-          <p class="sheet-note">Seus dados são usados só pela IMPRTS para falar com você sobre este aparelho.</p>
+          <p class="sheet-note">Seus dados são usados só pela IMPORTS para falar com você sobre este aparelho.</p>
         </div>
         <div class="sh-step s2" hidden>
           <h2>Confirmar interesse?</h2>
-          <p class="sheet-sub">Esta ficha e os seus dados vão para o WhatsApp da IMPRTS.</p>
+          <p class="sheet-sub">Esta ficha e os seus dados vão para o WhatsApp da IMPORTS.</p>
           <p class="sheet-who"></p>
           <div class="ficha"><div class="ficha-load"></div></div>
           <p class="sheet-err" hidden></p>
@@ -335,7 +335,7 @@
 
   /* ——— assistência (só iPhone): confirma o pedido de orçamento montado na página e abre o WhatsApp ———
      pre = { model: "iPhone 13 Pro · Grafite", img: "img/modelos/…webp", issues: ["Tela quebrada", …], details: "…" }
-     O relatório sai marcado como IMPRTS ASSISTÊNCIA, para a loja separar dos pedidos da loja normal. */
+     O relatório sai marcado como IMPORTS ASSISTÊNCIA, para a loja separar dos pedidos da loja normal. */
   function quote(pre) {
     pre = pre && typeof pre === "object" ? pre : {};
     const s = account0();
@@ -343,9 +343,9 @@
     const { el, close, f, read, err } = sheet(`
       <div class="qt">
         <h2 id="sheet-t">Pedir orçamento</h2>
-        <p class="sheet-sub">Confira o relatório. Ele chega no WhatsApp da loja marcado como <b>IMPRTS Assistência</b>.</p>
+        <p class="sheet-sub">Confira o relatório. Ele chega no WhatsApp da loja marcado como <b>IMPORTS Assistência</b>.</p>
         <div class="qt-sum">
-          <span class="qt-tag">IMPRTS Assistência · relatório do iPhone</span>
+          <span class="qt-tag">IMPORTS Assistência · relatório do iPhone</span>
           ${pre.img ? `<img src="${esc(pre.img)}" alt="">` : ""}
           <span class="qt-dev">${esc(pre.model || "iPhone")}</span>
           <span class="qt-iss">${issues.length ? issues.map(esc).join(" · ") : "Problema descrito abaixo"}</span>
@@ -355,7 +355,7 @@
         <div class="who-fields"${s ? " hidden" : ""}>${fields(s || saved())}</div>
         <p class="sheet-err" hidden></p>
         <button class="btn wa send">${U.waIcon()} Enviar pelo WhatsApp</button>
-        <p class="sheet-note">Seus dados ficam guardados neste celular e são usados só pela IMPRTS para falar com você.</p>
+        <p class="sheet-note">Seus dados ficam guardados neste celular e são usados só pela IMPORTS para falar com você.</p>
       </div>`);
     const who = $(".sheet-who", el), box = $(".who-fields", el);
     if (s) {
@@ -371,7 +371,7 @@
       err(".qt", "");
       store(c);
       const text = [
-        "*IMPRTS ASSISTÊNCIA · PEDIDO DE ORÇAMENTO*",
+        "*IMPORTS ASSISTÊNCIA · PEDIDO DE ORÇAMENTO*",
         "Relatório do iPhone enviado pelo site",
         "",
         `*iPhone:* ${pre.model || "iPhone"}`,
@@ -383,7 +383,7 @@
         `Telefone: ${maskPhone(c.phone)}`,
         c.email ? `E-mail: ${c.email}` : null,
         "",
-        `_Enviado pela página da IMPRTS Assistência${C.site ? ` (${C.site.replace(/^https?:\/\//, "")}/assistencia)` : ""}_`,
+        `_Enviado pela página da IMPORTS Assistência${C.site ? ` (${C.site.replace(/^https?:\/\//, "")}/assistencia)` : ""}_`,
       ].filter(l => l !== null).join("\n");
       U.flush();
       const url = U.wa(text);

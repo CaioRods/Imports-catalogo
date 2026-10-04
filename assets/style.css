@@ -1,4 +1,4 @@
-/* IMPRTS — preto fosco, branco e metal (mesma paleta do sistema). Pensado primeiro para o celular. */
+/* IMPORTS — preto fosco, branco e metal (mesma paleta do sistema). Pensado primeiro para o celular. */
 :root {
   --bg: #000;
   --bg-raised: #0b0b0d;
@@ -447,7 +447,7 @@ html.intro .intro-curtain { display: grid; place-items: center; position: fixed;
   html.intro .hero { --intro: 0s; }
 }
 
-/* ——— IMPRTS Assistência (assistencia.html) ——— */
+/* ——— IMPORTS Assistência (assistencia.html) ——— */
 .nav svg.logo-assist { height: 20px; }
 .hero-logo svg.logo-assist { height: clamp(96px, 26vw, 210px); }
 @media (max-width: 720px) { .hero-logo svg.logo-assist { height: 27vw; } }

@@ -1,4 +1,4 @@
-/* IMPRTS Assistência — design Apple (claro e escuro), só iPhone. Carregado depois do style.css. */
+/* IMPORTS Assistência — design Apple (claro e escuro), só iPhone. Carregado depois do style.css. */
 
 /* ——— tokens dos dois temas (também ajustam o menu, a janela e o rodapé, que vêm do style.css) ——— */
 :root[data-site="assist"] {

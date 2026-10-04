@@ -33,6 +33,7 @@ A **Imports Brasil** (marca **IMPRTS**, com a maçã no lugar do "O") **compra, 
 
 ## 2. Regras e preferências do Caio (leia primeiro)
 
+- **No texto, a marca é IMPORTS** ("IMPORTS Assistência", "Por que a IMPORTS", mensagens do WhatsApp). "IMPRTS" é só o desenho do logo, com a maçã no lugar do O. Nomes internos do código (`window.IMPRTS`, chaves `imprts.*`, o app de Mac "IMPRTS") continuam como estão.
 - Fala **português do Brasil**, direto e informal. Quer **ver resultado**, sem explicação longa. Respostas curtas, em PT-BR.
 - **Nunca pedir, usar nem repetir senhas** no chat (ele já mandou uma uma vez, e foi recusada).
 - **Não fazer `git push` nem publicar versão do app sem ele pedir.** Quando ele pede, fazer na hora.

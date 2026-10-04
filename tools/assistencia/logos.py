@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera os SVGs do logo IMPRTS Assistência (o cromado do topo troca de cor pelo tema: variáveis --ch0…--ch7, --ct0…--ct2) a partir de tools/assistencia/maca.json (rode maca.py antes).
+"""Gera os SVGs do logo IMPORTS Assistência (o cromado do topo troca de cor pelo tema: variáveis --ch0…--ch7, --ct0…--ct2) a partir de tools/assistencia/maca.json (rode maca.py antes).
 Imprime/grava os pedaços usados pela página assistencia.html:
   tools/assistencia/logo-nav.svg   — logo pequeno do menu (uma cor, currentColor)
   tools/assistencia/logo-hero.svg  — logo cromado do topo (mesmos efeitos do logo da loja)
@@ -18,9 +18,9 @@ VB = f"{VX} {VY} {VW} {VH}"
 TX, TY = 222.0 + 4.5, 124.0  # centro do texto (+ metade do espaçamento das letras, que sobra no fim)
 TEXT = f'<text x="{TX}" y="{TY}" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, system-ui, Segoe UI, Roboto, sans-serif" font-size="17" font-weight="500" letter-spacing="9">ASSISTÊNCIA</text>'
 
-nav = f'<svg class="logo logo-assist" viewBox="{VX} {VY} {VW} 98" role="img" aria-label="IMPRTS Assistência"><path fill="currentColor" d="{L}{M}"/></svg>'
+nav = f'<svg class="logo logo-assist" viewBox="{VX} {VY} {VW} 98" role="img" aria-label="IMPORTS Assistência"><path fill="currentColor" d="{L}{M}"/></svg>'
 
-hero = f'''<svg class="logo logo-hero logo-assist" viewBox="{VB}" role="img" aria-label="IMPRTS Assistência">
+hero = f'''<svg class="logo logo-hero logo-assist" viewBox="{VB}" role="img" aria-label="IMPORTS Assistência">
 <defs>
 <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ch0, #ffffff)"/><stop offset="0.18" style="stop-color:var(--ch1, #e9eaed)"/><stop offset="0.42" style="stop-color:var(--ch2, #8d9096)"/><stop offset="0.5" style="stop-color:var(--ch3, #5d6066)"/><stop offset="0.56" style="stop-color:var(--ch4, #c9cbcf)"/><stop offset="0.72" style="stop-color:var(--ch5, #f5f6f7)"/><stop offset="0.86" style="stop-color:var(--ch6, #a3a6ab)"/><stop offset="1" style="stop-color:var(--ch7, #6e7176)"/></linearGradient>
 <linearGradient id="chrome-t" x1="0" y1="{TY - 14}" x2="0" y2="{TY + 2}" gradientUnits="userSpaceOnUse"><stop offset="0" style="stop-color:var(--ct0, #ffffff)"/><stop offset=".55" style="stop-color:var(--ct1, #9c9fa5)"/><stop offset="1" style="stop-color:var(--ct2, #e9eaed)"/></linearGradient>

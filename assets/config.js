@@ -1,4 +1,4 @@
-// Configuração do site da IMPRTS. A chave abaixo é a pública (anon): só lê a vitrine,
+// Configuração do site da IMPORTS. A chave abaixo é a pública (anon): só lê a vitrine,
 // que não tem custo, IMEI, cliente nem nada interno.
 window.IMPRTS = {
   supabaseURL: "https://evaeprbbctemcnltjuwn.supabase.co",

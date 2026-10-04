@@ -1,4 +1,4 @@
-/* IMPRTS — catálogo ligado ao sistema (vitrine pública do Supabase). Sem dependências. */
+/* IMPORTS — catálogo ligado ao sistema (vitrine pública do Supabase). Sem dependências. */
 (() => {
   const C = window.IMPRTS;
   const $ = (s, el = document) => el.querySelector(s);
@@ -60,10 +60,10 @@
   }
 
 
-  /* ——— selos IMPRTS: emblema metálico + texto, na horizontal ——— */
+  /* ——— selos IMPORTS: emblema metálico + texto, na horizontal ——— */
   let sealN = 0;
   const SEALS = {
-    assist: { gold: true, title: "IMPRTS Assistance", text: "3 meses sem mão de obra",
+    assist: { gold: true, title: "IMPORTS Assistance", text: "3 meses sem mão de obra",
       icon: '<path d="M27 15.5a5.5 5.5 0 0 0-7.3 6.9L13 29.1l2.9 2.9 6.7-6.7a5.5 5.5 0 0 0 6.9-7.3l-3.2 3.2-2.7-.7-.7-2.7z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>' },
     bateria: { title: "Bateria certificada", text: "Saúde medida no cabo",
       icon: '<rect x="12" y="17" width="19" height="10" rx="2.5" fill="none" stroke="#fff" stroke-width="1.8"/><rect x="31.5" y="20" width="2" height="4" rx="1" fill="#fff"/><rect x="14.5" y="19.5" width="11" height="5" rx="1" fill="#34c77b"/>' },
@@ -426,7 +426,7 @@
   window.IMPRTS_UI = { money, esc, code, images, promo, now, wa, waIcon, flush, visitor, CONDITION, PARTS, form: (b, fn) => withForm(b, fn) };
 
   function contacts() {
-    $$("[data-wa]").forEach(a => { const l = wa(a.dataset.waText || "Olá! Vim pelo site da IMPRTS."); if (l) a.href = l; else a.style.display = "none"; });
+    $$("[data-wa]").forEach(a => { const l = wa(a.dataset.waText || "Olá! Vim pelo site da IMPORTS."); if (l) a.href = l; else a.style.display = "none"; });
     $$("[data-igs]").forEach(box => {
       box.innerHTML = (C.instagrams || []).map(u => `<a href="https://instagram.com/${esc(u)}" target="_blank" rel="noopener">@${esc(u)}</a>`).join("");
     });
