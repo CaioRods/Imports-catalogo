@@ -9,7 +9,7 @@ window.IMPRTS = {
   instagrams: ["rvrodriguess", "caio.riguess"],   // donos, sem @
   // Endereço do site no ar (Vercel). Com ele preenchido, o link da ficha no WhatsApp mostra a imagem
   // na prévia e leva ao produto; vazio = o link vai direto para a imagem.
-  site: "https://imprts.vercel.app",
+  site: "https://importsbrasil.com",
   endereco: "",
   cidade: "",
 };

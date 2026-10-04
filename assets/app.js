@@ -241,7 +241,7 @@
     let p;
     try { [p] = await vitrine(`&code=eq.${encodeURIComponent(c)}`); } catch {}
     if (!p) { root.innerHTML = '<p class="empty">Produto não encontrado. <a href="./#catalogo" style="text-decoration:underline">Ver o catálogo</a></p>'; return; }
-    document.title = `${p.name} · IMPRTS`;
+    document.title = `${p.name} · Imports Brasil`;
     const imgs = images(p);
     const parts = Object.entries(p.parts || {});
     const specs = [

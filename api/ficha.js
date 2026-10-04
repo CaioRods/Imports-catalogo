@@ -11,9 +11,9 @@ module.exports = function handler(req, res) {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=86400");
   res.end(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<title>Ficha do produto · IMPRTS</title>
-<meta property="og:title" content="Ficha do produto · IMPRTS">
-<meta property="og:description" content="Interesse enviado pelo site da IMPRTS.">
+<title>Ficha do produto · Imports Brasil</title>
+<meta property="og:title" content="Ficha do produto · Imports Brasil">
+<meta property="og:description" content="Interesse enviado pelo site da Imports Brasil.">
 <meta property="og:image" content="${img}">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1080"><meta property="og:image:height" content="1350">
