@@ -18,7 +18,15 @@
   const code = n => n == null ? "" : String(n).padStart(3, "0");
   const storage = (b, p) => `${C.supabaseURL}/storage/v1/object/public/${b}/${p}`;
   const COVERS_V = 3; // trocar quando as capas forem regeradas (fura o cache dos celulares)
-  const official = p => p.model_id && p.color_id ? `img/modelos/${p.model_id}/${p.color_id}.webp?v=${COVERS_V}` : "";
+  // Aparelhos que o sistema ainda não tem no catálogo de modelos vêm sem model_id (categoria "outro"):
+  // a capa é achada pelo nome. Quando o modelo entrar no catálogo do app, a linha daqui pode sair.
+  const BY_NAME = [[/\bph(antom|amton)\s*4\b/i, "dji-phantom-4"]];
+  const modelOf = p => p.model_id || (BY_NAME.find(([re]) => re.test(p.name || "")) || [])[1];
+  const official = p => modelOf(p) && p.color_id ? `img/modelos/${modelOf(p)}/${p.color_id}.webp?v=${COVERS_V}` : "";
+  // grupos do catálogo, nesta ordem (drone cadastrado como "outro" vai para Drones pelo nome)
+  const GROUPS = [["iphone", "iPhone"], ["macbook", "MacBook"], ["ipad", "iPad"], ["watch", "Apple Watch"], ["airpods", "AirPods"],
+    ["android", "Celulares"], ["drone", "Drones"], ["acessorio", "Acessórios"], ["outro", "Outros"]];
+  const groupOf = p => p.category === "outro" && /\b(drone|dji|ph(antom|amton)|mavic|avata)\b/i.test(p.name || "") ? "drone" : (GROUPS.some(([k]) => k === p.category) ? p.category : "outro");
 
   /** Imagens do produto: capa primeiro (oficial ou a foto escolhida), depois as fotos reais. */
   function images(p) {
@@ -208,7 +216,7 @@
 
     let cat = "todos", q = "", sort = "novos";
     const render = () => {
-      let list = all.filter(p => cat === "todos" || (cat === "outros" ? !["iphone", "macbook"].includes(p.category) : p.category === cat));
+      let list = all.filter(p => cat === "todos" || (cat === "outros" ? !["iphone", "macbook", "drone"].includes(groupOf(p)) : groupOf(p) === cat));
       if (q) {
         const n = q.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
         list = list.filter(p => `${p.name} ${code(p.code)} ${p.storage || ""}`.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().includes(n));
@@ -222,7 +230,18 @@
       list.sort(sorters[sort]);
       grid.innerHTML = "";
       if (!list.length) { grid.innerHTML = '<p class="empty">Nada encontrado com esse filtro.</p>'; return; }
-      list.forEach((p, i) => { const c = card(p); c.style.transitionDelay = `${Math.min(i % 8, 7) * 60}ms`; grid.appendChild(c); });
+      // agrupado por tipo (iPhone, MacBook, Drones…); com um grupo só, sem título
+      const groups = GROUPS.map(([k, label]) => [label, list.filter(p => groupOf(p) === k)]).filter(([, items]) => items.length);
+      for (const [label, items] of groups) {
+        if (groups.length > 1) {
+          const h = document.createElement("h3");
+          const n = items.filter(p => !p.vendido).length;
+          h.className = "group-title reveal";
+          h.innerHTML = `${esc(label)}${n ? `<span>${n} ${n > 1 ? "disponíveis" : "disponível"}</span>` : ""}`;
+          grid.appendChild(h);
+        }
+        items.forEach((p, i) => { const c = card(p); c.style.transitionDelay = `${Math.min(i % 8, 7) * 60}ms`; grid.appendChild(c); });
+      }
       revealOnScroll();
     };
     $$(".chip").forEach(b => b.addEventListener("click", () => { $$(".chip").forEach(x => x.classList.remove("on")); b.classList.add("on"); cat = b.dataset.cat; render(); }));
@@ -257,7 +276,7 @@
       ["Armazenamento", p.storage],
       ["Chip", p.chip], ["Memória", p.ram],
       ["Saúde da bateria", p.battery_health ? `<span class="batt ${p.battery_health <= 65 ? "low" : p.battery_health < 80 ? "mid" : ""}" style="margin:0;justify-content:flex-end"><b><i style="width:${Math.max(8, Math.min(100, p.battery_health)) * .17}px"></i></b>${p.battery_health}%</span>` : null],
-      ["Categoria", CATEGORY[p.category]],
+      ["Categoria", CATEGORY[groupOf(p)]],
       ["Código", code(p.code)],
     ].filter(([, v]) => v);
     root.innerHTML = `

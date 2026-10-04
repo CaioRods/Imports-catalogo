@@ -163,6 +163,8 @@ tools/textura/        gerador da textura de pedra
 - **Estilização:** `estilizar.swift` tira o fundo com preenchimento a partir das bordas (**não usar o Vision**, ele come aparelho claro), centraliza e põe sombra.
 - **Geração:** `gerar.sh` gera WebP de 800 px. **Não usar PNG quantizado**, porque cria faixas.
 - **Drones:** fotos oficiais da DJI.
+  - **Sem Mac:** `estilizar.py` faz o mesmo enquadramento e sombra em Python (Pillow), para imagens que já vêm sem fundo, como as da DJI. Uso: `python3 tools/fotos-oficiais/estilizar.py entrada.png img/modelos/<modelo>/<cor>.webp`.
+  - **Phantom 4** (`img/modelos/dji-phantom-4/branco.webp`, da loja oficial da DJI): o app ainda não tem esse modelo no catálogo, então o produto vem como categoria "outro" e sem `model_id`. O site acha a capa pelo nome (`BY_NAME` em `app.js`) e o põe no grupo Drones. Quando o Phantom 4 entrar no `DroneCatalog` do app com o id `dji-phantom-4`, essa linha pode sair.
 - **Sem foto oficial** (MacBook 12" 2015–17, Air 2015): usa o render 3D do app (`--render-covers`).
 - **Modelo novo:**
   1. Exportar o json.
