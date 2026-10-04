@@ -443,9 +443,11 @@
     // e deixar um véu por cima da tela)
     const curtain = $(".intro-curtain");
     if (curtain && document.documentElement.classList.contains("intro")) {
+      const zoom = $(".intro-curtain .zoom");
       const done = () => curtain.remove();
-      $(".intro-curtain .zoom")?.addEventListener("animationend", done, { once: true });
-      setTimeout(done, 3000);
+      // só o fim do próprio zoom (as animações de dentro também disparam "animationend" e sobem até aqui)
+      zoom?.addEventListener("animationend", e => { if (e.target === zoom && e.animationName === "intro-zoom") done(); });
+      setTimeout(done, 3200);
     }
     contacts();
     contaBtn();
