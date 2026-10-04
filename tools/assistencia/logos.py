@@ -48,12 +48,12 @@ intro = f'''<div class="intro-curtain" aria-hidden="true"><div class="zoom"><svg
 <linearGradient id="intro-chrome" x1="0" y1="0" x2="0" y2="82" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset=".42" stop-color="#8d9096"/><stop offset=".5" stop-color="#5d6066"/><stop offset=".72" stop-color="#f5f6f7"/><stop offset="1" stop-color="#8d9096"/></linearGradient>
 <linearGradient id="intro-shine" x1="0" y1="0" x2="1" y2="0"><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".8"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/>
 <animateTransform attributeName="gradientTransform" type="translate" values="-1 0;1 0" dur="1.1s" begin=".2s" fill="freeze"/></linearGradient>
-<clipPath id="intro-logo"><path d="{L}{M}"/></clipPath>
+<clipPath id="intro-logo"><path d="{L}"/></clipPath>
 </defs>
 <path class="wall" fill="#000" fill-rule="evenodd" d="{big}{M}"/>
 <path class="plug" fill="#000" d="{M}"/>
 <g class="ink"><path fill="url(#intro-chrome)" d="{L}"/><path class="silver" fill="url(#intro-chrome)" d="{M}"/>
-<rect clip-path="url(#intro-logo)" x="{VX}" y="{VY}" width="{VW}" height="100" fill="url(#intro-shine)"/>
+<rect class="shine" clip-path="url(#intro-logo)" x="{VX}" y="{VY}" width="{VW}" height="100" fill="url(#intro-shine)"/>
 <g fill="#c9cbcf">{TEXT}</g></g>
 </svg></div></div>'''
 

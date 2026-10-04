@@ -439,6 +439,14 @@
   // roda assim que o script executa (já com a página lida): a tela nasce desenhada com o cache,
   // e a transição entre telas captura o aparelho no lugar certo
   const init = () => {
+    // abertura da marca: ao terminar o zoom, a cortina sai da página (no iPhone o "esconder" por CSS pode falhar
+    // e deixar um véu por cima da tela)
+    const curtain = $(".intro-curtain");
+    if (curtain && document.documentElement.classList.contains("intro")) {
+      const done = () => curtain.remove();
+      $(".intro-curtain .zoom")?.addEventListener("animationend", done, { once: true });
+      setTimeout(done, 3000);
+    }
     contacts();
     contaBtn();
     $$("[data-conta]").forEach(b => b.addEventListener("click", () => withForm(b, f => f.account())));

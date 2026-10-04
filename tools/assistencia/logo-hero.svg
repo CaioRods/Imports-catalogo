@@ -1,4 +1,4 @@
-<svg class="logo logo-hero logo-assist" viewBox="-14.0 -4.0 474.0 136.0" role="img" aria-label="IMPRTS Assistência">
+<svg class="logo logo-hero logo-assist" viewBox="-14.0 -4.0 474.0 136.0" role="img" aria-label="IMPORTS Assistência">
 <defs>
 <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ch0, #ffffff)"/><stop offset="0.18" style="stop-color:var(--ch1, #e9eaed)"/><stop offset="0.42" style="stop-color:var(--ch2, #8d9096)"/><stop offset="0.5" style="stop-color:var(--ch3, #5d6066)"/><stop offset="0.56" style="stop-color:var(--ch4, #c9cbcf)"/><stop offset="0.72" style="stop-color:var(--ch5, #f5f6f7)"/><stop offset="0.86" style="stop-color:var(--ch6, #a3a6ab)"/><stop offset="1" style="stop-color:var(--ch7, #6e7176)"/></linearGradient>
 <linearGradient id="chrome-t" x1="0" y1="110.0" x2="0" y2="126.0" gradientUnits="userSpaceOnUse"><stop offset="0" style="stop-color:var(--ct0, #ffffff)"/><stop offset=".55" style="stop-color:var(--ct1, #9c9fa5)"/><stop offset="1" style="stop-color:var(--ct2, #e9eaed)"/></linearGradient>

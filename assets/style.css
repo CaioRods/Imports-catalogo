@@ -427,7 +427,7 @@ html.intro .intro-curtain { display: grid; place-items: center; position: fixed;
 .intro-curtain .zoom { width: min(64vw, 440px); transform-origin: 47.73% 61.52%; animation: intro-zoom 1.6s linear .95s both; }
 .intro-curtain svg { display: block; width: 100%; height: auto; overflow: visible; }
 .intro-curtain .ink { animation: intro-in .75s cubic-bezier(.2, .8, .2, 1) both; }
-.intro-curtain .plug, .intro-curtain .silver { animation: apple-open .45s cubic-bezier(.4, 0, .2, 1) 1s both; }
+.intro-curtain .plug, .intro-curtain .silver, .intro-curtain .shine { animation: apple-open .45s cubic-bezier(.4, 0, .2, 1) 1s both; }
 @keyframes intro-in { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
 @keyframes apple-open { from { opacity: 1; } to { opacity: 0; } }
 /* cresce devagar e acelera de forma contínua: escala = 70^(t^2,6), em 24 passos (sem degraus de velocidade) */

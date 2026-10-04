@@ -175,6 +175,7 @@ tools/textura/        gerador da textura de pedra
 - **Logo = o MESMO do sistema**, em vetores exportados do app (`IMPRTS --export-wordmark`, build de desenvolvimento) e embutidos como SVG. Não trocar por fonte da web nem esticar a maçã.
   - No hero ele é **cromado**: gradiente, filtro `bevel` e brilho recortado nas letras.
 - **Fundo de caverna:** pedras cinza-escuras, muito escuro, pouquíssima luz só no centro, escurecendo ao descer.
+- **Abertura no iPhone:** o brilho da cortina passa só pelas letras (nunca pela maçã) e some junto com o prateado; no fim o `app.js` **remove a cortina da página** (no Safari do iPhone o brilho animado por SVG podia ficar parado sobre a maçã e virar um véu branco na tela).
 - **NUNCA** colocar camada sobre o quadro inteiro (`mix-blend-mode`, `-webkit-box-reflect`, `filter: drop-shadow` nas imagens do hero): no Chrome isso revela uma caixa retangular, e o Caio odiou.
 - URLs dentro de variáveis CSS resolvem a partir de `assets/`; por isso a máscara do reflexo fica inline no HTML.
 - **Selos:** horizontais e simples (emblema metálico + título + uma linha). No celular, 2 por linha.
