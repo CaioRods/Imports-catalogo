@@ -55,6 +55,10 @@ declare events jsonb;
 begin
   begin events := $1::jsonb; exception when others then return; end;
   if length($1) > 20000 or jsonb_typeof(events) <> 'array' or jsonb_array_length(events) > 60 then return; end if;
+  -- trava contra robô enchendo o banco: 600 eventos por visitante e 20 mil no total, por hora
+  -- (uma pessoa de verdade fica muito abaixo disso)
+  if (select count(*) from site_events where visitor = left(events->0->>'v', 40) and at > now() - interval '1 hour') >= 600
+     or (select count(*) from site_events where at > now() - interval '1 hour') >= 20000 then return; end if;
   insert into site_events (visitor, session, kind, product_code, seconds, device, referrer)
   select left(e->>'v', 40), left(e->>'s', 40), e->>'k',
          case when e->>'c' ~ '^\d{1,6}$' then (e->>'c')::int end,
@@ -84,6 +88,10 @@ begin
   if (select count(*) from leads where phone = digits and created_at > now() - interval '1 hour') >= 5 then
     raise exception 'muitos pedidos';
   end if;
+  -- e no máximo 100 pedidos no total por hora (quem troca o número a cada envio para aqui)
+  if (select count(*) from leads where created_at > now() - interval '1 hour') >= 100 then
+    raise exception 'muitos pedidos';
+  end if;
   select id, name, coalesce(promo_price, price) as price into v from vitrine where code = p_code;
   insert into leads (name, phone, email, visitor, product_id, product_code, product_name, price)
   values (trim(p_name), digits, nullif(trim(lower(coalesce(p_email, ''))), ''), left(p_visitor, 40), v.id, p_code, v.name, v.price)
@@ -99,13 +107,19 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 values ('interesses', 'interesses', true, 1048576, array['image/jpeg'])
 on conflict (id) do update set public = true, file_size_limit = 1048576, allowed_mime_types = array['image/jpeg'];
 
+-- A conferência fica numa função "security definer": o site (anon) não enxerga a tabela leads,
+-- então um "exists (select … from leads)" direto na regra sempre dava falso e a ficha nunca subia.
+create or replace function public.lead_recente(obj text) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from leads l
+                 where l.id::text || '.jpg' = obj and l.created_at > now() - interval '10 minutes');
+$$;
+revoke all on function public.lead_recente(text) from public;
+grant execute on function public.lead_recente(text) to anon, authenticated;
+
 drop policy if exists "interesses: site envia a ficha" on storage.objects;
 create policy "interesses: site envia a ficha" on storage.objects for insert to anon, authenticated
-  with check (
-    bucket_id = 'interesses'
-    and exists (select 1 from public.leads l
-                where l.id::text || '.jpg' = storage.objects.name and l.created_at > now() - interval '10 minutes')
-  );
+  with check (bucket_id = 'interesses' and public.lead_recente(name));
 
 -- 6. Painel "Clientes" do sistema: tudo agregado no banco, numa chamada só
 create or replace function public.site_stats(days int default 7) returns jsonb

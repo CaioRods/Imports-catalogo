@@ -230,7 +230,15 @@
     $("#sort").addEventListener("change", e => { sort = e.target.value; render(); });
     render();
     // atualiza sozinho (venda feita na loja some/aparece "Vendido")
-    setInterval(async () => { try { all = await vitrine("&order=code.desc"); $("#count").textContent = all.filter(p => !p.vendido).length; render(); } catch {} }, 60000);
+    // (só com a aba visível e só redesenha se algo mudou, para a grade não piscar)
+    setInterval(async () => {
+      if (document.hidden) return;
+      try {
+        const fresh = await vitrine("&order=code.desc");
+        if (JSON.stringify(fresh) === JSON.stringify(all)) return;
+        all = fresh; $("#count").textContent = all.filter(p => !p.vendido).length; render();
+      } catch {}
+    }, 60000);
   }
 
   /* ——— página do produto ——— */

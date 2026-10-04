@@ -226,10 +226,11 @@
     document.body.appendChild(el);
     document.documentElement.classList.add("noscroll");
     requestAnimationFrame(() => el.classList.add("on"));
-    const close = () => { el.classList.remove("on"); document.documentElement.classList.remove("noscroll"); setTimeout(() => el.remove(), 320); };
+    const onKey = e => { if (e.key === "Escape") close(); };
+    const close = () => { removeEventListener("keydown", onKey); el.classList.remove("on"); document.documentElement.classList.remove("noscroll"); setTimeout(() => el.remove(), 320); };
     el.addEventListener("click", e => { if (e.target === el) close(); });
     $(".sheet-x", el).onclick = close;
-    addEventListener("keydown", function esc(e) { if (e.key === "Escape") { close(); removeEventListener("keydown", esc); } });
+    addEventListener("keydown", onKey);
 
     const f = n => $(`input[name=${n}]`, el);
     f("phone").addEventListener("input", e => { e.target.value = maskPhone(e.target.value); });
@@ -261,12 +262,14 @@
       const b = e.currentTarget;
       if (b.disabled || !card) return;
       b.disabled = true; b.classList.add("busy"); b.lastChild.textContent = " Enviando…";
-      let id = null, link = null;
+      let id = null, link = null, wait = 0;
       try {
         id = await withTimeout(rpc("site_lead", { p_name: client.name, p_phone: "55" + client.phone, p_email: client.email || null, p_visitor: U.visitor, p_code: p.code }), 6000);
       } catch (x) {
-        if (String(x).includes("muitos pedidos")) { err("s2", "Você já enviou vários pedidos agora. Fale direto pelo WhatsApp da loja."); }
+        // dá tempo de ler o aviso antes de abrir o WhatsApp
+        if (String(x).includes("muitos pedidos")) { err("s2", "Você já enviou vários pedidos agora. Fale direto pelo WhatsApp da loja."); wait = 2500; }
       }
+      if (wait) await new Promise(ok => setTimeout(ok, wait));
       if (id) {
         const blob = await new Promise(ok => { try { card.toBlob(ok, "image/jpeg", .86); } catch { ok(null); } });
         const ok = blob && await withTimeout(upload(id, blob), 8000);

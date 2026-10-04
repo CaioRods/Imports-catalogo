@@ -55,6 +55,10 @@ SQL no app em `~/Documents/IMPRTS/backend/supabase/`. Os do site têm cópia em 
 | `compartilhado.sql`, `contas-dos-macs.sql`, `tempo-real.sql`, `siri.sql` | Ajustes de acesso, contas dos Macs, tempo real, voz | Sim |
 | `site.sql` | `products.description/photos/cover/promo_price/promo_until`, pasta pública `produtos`, view **`vitrine`** (com `promocao`) | Sim |
 | `clientes.sql` | `site_events`, `leads`, funções `site_track(text)`, `site_lead(...)`, `site_stats(days)`, pasta `interesses` | Sim |
+| **`banco-completo.sql`** (neste repositório) | **Todos os arquivos acima num só**, com as correções de 4/out/2026: lista `contas_loja` + função `eh_loja()` (só contas da loja leem/escrevem), ficha do interesse voltando a subir (`lead_recente`), trava contra robô em `site_track`/`site_lead`. É o arquivo de referência daqui para frente | Rodar |
+
+- **Conta nova da loja** (Mac novo com outra conta): depois de criar em Authentication, rode `insert into public.contas_loja (user_id, email) select id, email from auth.users where email = '<email>';`. Sem isso a conta entra mas não vê nada.
+- **Cadastro do Supabase:** deixar desligado (*Authentication → Sign In / Providers → Allow new users to sign up*).
 
 - **`vitrine`** (o que o site lê). Mostra só produtos com `publish = true`, não apagados, e vendidos há no máximo 7 dias. **Não expõe** custo, IMEI, cliente nem observações. A promoção só aparece enquanto vale.
 - **Regra de ouro do app:** `SyncEngine.productColumns` tem de bater **exatamente** com as colunas do banco. Coluna nova no app só depois de o SQL estar aplicado; senão a sincronização de **todos os Macs** para.
