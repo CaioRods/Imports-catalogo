@@ -334,7 +334,8 @@
   }
 
   /* ——— assistência (só iPhone): confirma o pedido de orçamento montado na página e abre o WhatsApp ———
-     pre = { model: "iPhone 13 Pro", issues: ["Tela quebrada", …], details: "…" } */
+     pre = { model: "iPhone 13 Pro · Grafite", img: "img/modelos/…webp", issues: ["Tela quebrada", …], details: "…" }
+     O relatório sai marcado como IMPRTS ASSISTÊNCIA, para a loja separar dos pedidos da loja normal. */
   function quote(pre) {
     pre = pre && typeof pre === "object" ? pre : {};
     const s = account0();
@@ -342,10 +343,12 @@
     const { el, close, f, read, err } = sheet(`
       <div class="qt">
         <h2 id="sheet-t">Pedir orçamento</h2>
-        <p class="sheet-sub">Confira o pedido. Ele chega no WhatsApp da <b>IMPRTS Assistência</b>.</p>
+        <p class="sheet-sub">Confira o relatório. Ele chega no WhatsApp da loja marcado como <b>IMPRTS Assistência</b>.</p>
         <div class="qt-sum">
+          <span class="qt-tag">IMPRTS Assistência · relatório do iPhone</span>
+          ${pre.img ? `<img src="${esc(pre.img)}" alt="">` : ""}
           <span class="qt-dev">${esc(pre.model || "iPhone")}</span>
-          ${issues.length ? `<span class="qt-iss">${issues.map(esc).join(" · ")}</span>` : ""}
+          <span class="qt-iss">${issues.length ? issues.map(esc).join(" · ") : "Problema descrito abaixo"}</span>
         </div>
         <label>Quer contar mais? <span>(opcional)</span><textarea name="issue" rows="3" placeholder="Ex.: caiu e a tela ficou preta, bateria acaba antes do almoço">${esc(pre.details || "")}</textarea></label>
         <p class="sheet-who"${s ? "" : " hidden"}></p>
@@ -368,16 +371,19 @@
       err(".qt", "");
       store(c);
       const text = [
-        "Olá, IMPRTS Assistência! Quero um orçamento:",
+        "*IMPRTS ASSISTÊNCIA · PEDIDO DE ORÇAMENTO*",
+        "Relatório do iPhone enviado pelo site",
         "",
-        `*Aparelho:* ${pre.model || "iPhone"}`,
-        issues.length ? `*Problema:* ${issues.join(", ")}` : null,
+        `*iPhone:* ${pre.model || "iPhone"}`,
+        issues.length ? `*Problemas:* ${issues.join(", ")}` : null,
         details ? `*Detalhes:* ${details}` : null,
         "",
-        "*Meus dados*",
+        "*Cliente*",
         `Nome: ${c.name}`,
         `Telefone: ${maskPhone(c.phone)}`,
         c.email ? `E-mail: ${c.email}` : null,
+        "",
+        `_Enviado pela página da IMPRTS Assistência${C.site ? ` (${C.site.replace(/^https?:\/\//, "")}/assistencia)` : ""}_`,
       ].filter(l => l !== null).join("\n");
       U.flush();
       const url = U.wa(text);

@@ -105,29 +105,48 @@ html.intro .a-hero { --intro: .7s; }
 .q-step small { font-size: 14px; font-weight: 400; color: var(--faint); }
 @keyframes q-pop { 50% { transform: scale(1.18); } }
 
-.models { display: grid; grid-auto-flow: column; grid-auto-columns: 42%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
-  padding: 6px 16px 18px; margin: 0 -16px; scroll-padding: 0 16px; scrollbar-width: none; }
-@media (min-width: 768px) { .models { grid-auto-columns: 19%; gap: 16px; } }
-.models::-webkit-scrollbar { display: none; }
-.m { appearance: none; position: relative; scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;
-  padding: 18px 10px 16px; border-radius: 24px; border: 0; background: var(--surface); color: var(--text); font: inherit; cursor: pointer;
-  box-shadow: inset 0 0 0 0 var(--sel); transition: box-shadow .3s var(--e-apple), transform .25s var(--e-apple), background .3s; }
-.m:active { transform: scale(.97); }
-.m.on { box-shadow: inset 0 0 0 2px var(--sel); }
-.m .pic { height: 132px; width: 100%; display: grid; place-items: center; margin-bottom: 8px; }
-.m .pic img { max-height: 100%; max-width: 94%; object-fit: contain; transition: transform .7s var(--e-apple); }
-@media (hover: hover) { .m:hover .pic img { transform: translateY(-5px) scale(1.03); } }
-.m b { font-size: 15px; font-weight: 600; line-height: 1.2; }
-.m small { font-size: 12px; color: var(--faint); }
-.m .ok { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: var(--sel); color: var(--bg); display: grid; place-items: center;
-  transform: scale(0); transition: transform .35s var(--e-apple); }
-.m .ok svg { width: 12px; height: 12px; }
-.m.on .ok { transform: scale(1); }
-.m.unknown .pic { font-size: 54px; font-weight: 200; color: var(--faint); }
-@supports (animation-timeline: view()) {
-  .m { animation: q-glide linear both; animation-timeline: view(inline); animation-range: entry 0% cover 30%; }
-  @keyframes q-glide { from { opacity: .35; transform: scale(.9); } to { opacity: 1; transform: none; } }
-}
+/* busca do iPhone */
+.q-find { position: relative; z-index: 6; }
+.q-search { display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 8px 0 18px; border-radius: 18px; background: var(--surface);
+  box-shadow: inset 0 0 0 0 var(--link); transition: box-shadow .2s var(--e-apple); }
+.q-search:focus-within { box-shadow: inset 0 0 0 2px var(--link); }
+.q-search svg { width: 20px; height: 20px; color: var(--faint); flex: none; }
+.q-search input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; color: var(--text); font: 17px var(--font); outline: none; }
+.q-search input::placeholder { color: var(--faint); }
+.q-search input::-webkit-search-cancel-button { display: none; }
+.q-clear { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--hair-strong); color: var(--text); font-size: 17px; line-height: 1; cursor: pointer; }
+.q-sug { position: absolute; left: 0; right: 0; top: calc(100% + 8px); max-height: min(420px, 55vh); overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: 6px;
+  list-style: none; border-radius: 20px; background: var(--surface-2); border: 1px solid var(--hair); box-shadow: 0 24px 60px -20px rgba(0,0,0,.55); animation: sug-in .28s var(--e-apple); }
+.q-sug li { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 14px; cursor: pointer; transition: background .15s; }
+.q-sug li:hover, .q-sug li.on { background: var(--surface); }
+.q-sug .th { width: 44px; height: 44px; flex: none; display: grid; place-items: center; color: var(--faint); font-size: 22px; font-weight: 300; }
+.q-sug .th img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.q-sug .tx b { display: block; font-size: 15px; font-weight: 600; }
+.q-sug .tx small { font-size: 12px; color: var(--faint); }
+@keyframes sug-in { from { opacity: 0; transform: translateY(-6px); } }
+
+/* escolhido: a foto oficial entra e fica respirando; dá para trocar a cor */
+.q-picked { display: grid; gap: 4px; margin-top: 16px; padding: 22px 20px 24px; border-radius: var(--r-lg); background: var(--surface); text-align: center; animation: pk-in .6s var(--e-apple); }
+@media (min-width: 640px) { .q-picked { grid-template-columns: 280px 1fr; text-align: left; align-items: center; gap: 30px; padding: 26px 34px; } }
+.q-photo { position: relative; height: 250px; display: grid; place-items: center; }
+.q-photo .glow { position: absolute; left: 50%; top: 50%; width: 120%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, var(--glow), transparent 72%); animation: a-light 14s var(--e-io) infinite; }
+.q-photo img { position: relative; max-height: 100%; max-width: 100%; object-fit: contain; opacity: 0; transform: translateY(18px) scale(.93); filter: blur(6px);
+  transition: opacity .7s var(--e-apple), transform .9s var(--e-apple), filter .7s var(--e-apple); }
+.q-photo img.in { opacity: 1; transform: none; filter: none; animation: a-breathe 7s var(--e-io) 1s infinite; }
+.q-picked.unknown .q-photo img { display: none; }
+.q-picked.unknown .q-photo::after { content: "?"; position: relative; font-size: 120px; font-weight: 200; color: var(--faint); }
+.q-info b { display: block; font-size: var(--fs-h3); font-weight: 600; letter-spacing: -.01em; }
+.q-info small { display: block; color: var(--faint); font-size: 14px; margin-top: 2px; }
+.q-colors { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 16px 0 8px; }
+@media (min-width: 640px) { .q-colors { justify-content: flex-start; } }
+.q-colors button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: var(--sw); cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.18), 0 0 0 2px var(--surface), 0 0 0 2px transparent; transition: box-shadow .25s var(--e-apple), transform .2s var(--e-apple); }
+.q-colors button:active { transform: scale(.9); }
+.q-colors button.on { box-shadow: inset 0 0 0 1px rgba(0,0,0,.18), 0 0 0 2px var(--surface), 0 0 0 4px var(--sel); }
+.q-color-name { display: block; min-height: 18px; font-size: 13px; color: var(--dim); }
+.q-info .linkbtn { margin-top: 12px; padding: 6px 0; color: var(--link); text-decoration: none; font-weight: 500; font-size: 15px; }
+@keyframes pk-in { from { opacity: 0; transform: translateY(16px) scale(.98); } }
 
 .probs { display: flex; flex-wrap: wrap; gap: 8px; }
 .pb { appearance: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 12px; border-radius: 999px; border: 0;
@@ -184,6 +203,8 @@ html[data-site="assist"] footer { padding-bottom: 120px; }
 }
 
 #orcamento { scroll-margin-top: 76px; }
-.qt-sum { display: flex; flex-direction: column; gap: 4px; margin: 0 0 16px; padding: 14px 16px; border-radius: 16px; background: rgba(127,127,127,.1); }
+.qt-sum { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 14px; row-gap: 2px; margin: 0 0 16px; padding: 12px 16px; border-radius: 16px; background: rgba(127,127,127,.1); }
+.qt-sum img { grid-row: span 2; width: 56px; height: 56px; object-fit: contain; }
+.qt-sum .qt-tag { grid-column: 1 / -1; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
 .qt-sum .qt-dev { font-weight: 600; font-size: 16px; }
 .qt-sum .qt-iss { font-size: 13.5px; color: var(--dim); }

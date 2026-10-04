@@ -18,12 +18,12 @@
 <link rel="preload" as="image" href="img/pedra.webp" media="(min-width: 721px)">
 <link rel="apple-touch-icon" href="img/icon.png">
 <script>/* abertura da marca: só na primeira tela de cada visita */try{if(!sessionStorage.getItem("imprts.intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("intro");sessionStorage.setItem("imprts.intro","1")}}catch(e){}</script>
-<link rel="stylesheet" href="assets/style.css?v=1791126159">
-<link rel="stylesheet" href="assets/assist.css?v=1791126159">
-<script src="assets/config.js?v=1791126159"></script>
-<script src="assets/app.js?v=1791126159" defer blocking="render"></script>
-<script src="assets/iphones.js?v=1791126159" defer></script>
-<script src="assets/assist.js?v=1791126159" defer></script>
+<link rel="stylesheet" href="assets/style.css?v=1791126560">
+<link rel="stylesheet" href="assets/assist.css?v=1791126560">
+<script src="assets/config.js?v=1791126560"></script>
+<script src="assets/app.js?v=1791126560" defer blocking="render"></script>
+<script src="assets/iphones.js?v=1791126560" defer></script>
+<script src="assets/assist.js?v=1791126560" defer></script>
 </head>
 <body data-page="assist">
 <div class="intro-curtain" aria-hidden="true"><div class="zoom"><svg viewBox="-14.0 -4.0 474.0 136.0">
@@ -77,10 +77,27 @@
 <main class="wrap">
   <section class="a-sec" id="orcamento">
     <h2 class="a-big reveal">Peça seu orçamento.</h2>
-    <p class="a-lead reveal">Escolha o iPhone, marque o que está acontecendo e o pedido chega pronto no WhatsApp da loja.</p>
+    <p class="a-lead reveal">Busque o seu iPhone, marque o que está acontecendo e o relatório chega pronto no WhatsApp da IMPRTS Assistência.</p>
 
     <div class="q-step reveal" id="s1"><i>1</i>Qual é o seu iPhone?</div>
-    <div class="models" id="models" role="listbox" aria-label="Modelo do iPhone"></div>
+    <div class="q-find reveal">
+      <div class="q-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <input id="find" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Busque o modelo: 13 Pro, XR, 15 Plus…"
+          role="combobox" aria-expanded="false" aria-controls="sug" aria-autocomplete="list" aria-label="Modelo do iPhone">
+        <button class="q-clear" id="find-x" aria-label="Limpar" hidden>×</button>
+      </div>
+      <ul class="q-sug" id="sug" role="listbox" hidden></ul>
+    </div>
+    <div class="q-picked" id="picked" hidden>
+      <div class="q-photo"><div class="glow"></div><img id="pk-img" alt=""></div>
+      <div class="q-info">
+        <b id="pk-name"></b><small id="pk-year"></small>
+        <div class="q-colors" id="pk-colors" role="radiogroup" aria-label="Cor"></div>
+        <span class="q-color-name" id="pk-cname"></span>
+        <button class="linkbtn" id="pk-change">Trocar modelo</button>
+      </div>
+    </div>
 
     <div class="q-step reveal" id="s2"><i>2</i>O que está acontecendo?</div>
     <div class="probs reveal" id="probs" role="group" aria-label="Problemas"></div>

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Gera assets/iphones.js (lista do "Qual é o seu iPhone?" da assistência) a partir do catálogo oficial
-tools/fotos-oficiais/iphones.json: nome, ano e a capa de uma cor que exista em img/modelos/.
+tools/fotos-oficiais/iphones.json: nome, ano, a capa padrão e as cores que têm foto em img/modelos/.
 Do mais novo ao mais antigo; no mesmo ano, Pro Max > Pro > Air/Plus > normal > "e".
 Uso: python3 tools/assistencia/iphones.py   (rodar de novo quando entrar modelo novo no catálogo)"""
 import json, os
@@ -20,7 +20,9 @@ for m in cat:
     colors = [c for c in pref if c in m["colors"]] + [c for c in m["colors"] if c not in pref]
     cover = next((c for c in colors if os.path.exists(os.path.join(folder, c + ".webp"))), None)
     if cover:
-        out.append({"id": m["id"], "name": m["name"], "year": m["year"], "img": f"img/modelos/{m['id']}/{cover}.webp"})
+        # todas as cores com foto (a escolhida na busca troca a imagem)
+        cs = [c for c in colors if os.path.exists(os.path.join(folder, c + ".webp"))]
+        out.append({"id": m["id"], "name": m["name"], "year": m["year"], "img": f"img/modelos/{m['id']}/{cover}.webp", "colors": cs})
 out.sort(key=lambda m: (-m["year"], -tier(m["id"]), m["name"]))
 js = ("/* gerado por tools/assistencia/iphones.py — não editar à mão */\nwindow.IMPRTS_IPHONES = "
       + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
