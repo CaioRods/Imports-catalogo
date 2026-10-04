@@ -388,22 +388,22 @@ html.vt-back::view-transition-new(root) { animation: vt-undim .85s cubic-bezier(
 html.vt-filter::view-transition-group(*) { animation-duration: .55s; animation-timing-function: cubic-bezier(.3, 0, .2, 1); }
 html.vt-filter::view-transition-old(root), html.vt-filter::view-transition-new(root) { animation-duration: .3s; }
 
-/* ——— abertura da marca (uma vez por visita): logo cromado com brilho, e o site surge pela maçã ——— */
+/* ——— abertura da marca (uma vez por visita) ———
+   O logo surge cromado; a maçã prateada perde o preenchimento e vira a janela para o site;
+   o conjunto cresce a partir da maçã até ela tomar a tela (tudo no mesmo desenho, sincronizado). */
 .intro-curtain { display: none; }
-html.intro .hero { --intro: 1.35s; }
-html.intro .intro-curtain { display: grid; place-items: center; position: fixed; inset: 0; z-index: 300; background: #000; pointer-events: none;
-  -webkit-mask: linear-gradient(#000 0 0), url(../img/apple.svg) 50% 58% / 0 auto no-repeat; -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0), url(../img/apple.svg) 50% 58% / 0 auto no-repeat; mask-composite: exclude;
-  animation: curtain-open 1s cubic-bezier(.7, 0, .2, 1) 1.15s both; }
-html.intro .intro-curtain i { display: block; width: min(64vw, 440px); aspect-ratio: 449.64 / 85.73;
-  background: linear-gradient(100deg, #8d9096 0%, #fff 18%, #8d9096 36%, #5d6066 46%, #f5f6f7 58%, #8d9096 72%, #fff 86%, #8d9096 100%) 100% 0 / 260% 100%;
-  -webkit-mask: url(../img/logo.svg) center / contain no-repeat; mask: url(../img/logo.svg) center / contain no-repeat;
-  animation: intro-logo 1.3s cubic-bezier(.2, .8, .2, 1) both, intro-shine 1.2s ease-in-out .15s both; }
-@keyframes intro-logo { 0% { opacity: 0; transform: scale(.94); filter: blur(8px); } 40% { opacity: 1; transform: none; filter: none; } 82% { opacity: 1; transform: scale(1.02); } 100% { opacity: 0; transform: scale(1.06); } }
-@keyframes intro-shine { to { background-position: 0 0; } }
-@keyframes curtain-open { 0% { -webkit-mask-size: 100% 100%, 0 auto; mask-size: 100% 100%, 0 auto; }
-  35% { -webkit-mask-size: 100% 100%, 20vmax auto; mask-size: 100% 100%, 20vmax auto; }
-  100% { -webkit-mask-size: 100% 100%, 340vmax auto; mask-size: 100% 100%, 340vmax auto; visibility: hidden; } }
+html.intro .hero { --intro: .7s; } /* os iPhones já sobem dentro da maçã enquanto ela cresce */
+html.intro .intro-curtain { display: grid; place-items: center; position: fixed; inset: 0; z-index: 300; pointer-events: none; overflow: hidden;
+  animation: intro-end 0s 2.3s forwards; }
+.intro-curtain .zoom { width: min(64vw, 440px); transform-origin: 47.73% 61.52%; animation: intro-zoom 1.3s linear 1s both; }
+.intro-curtain svg { display: block; width: 100%; height: auto; overflow: visible; }
+.intro-curtain .ink { animation: intro-in .75s cubic-bezier(.2, .8, .2, 1) both; }
+.intro-curtain .plug, .intro-curtain .silver { animation: apple-open .45s cubic-bezier(.4, 0, .2, 1) 1s both; }
+@keyframes intro-in { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
+@keyframes apple-open { from { opacity: 1; } to { opacity: 0; } }
+/* cresce devagar e acelera (escala quase exponencial): o logo "vem" para a tela e a maçã engole tudo */
+@keyframes intro-zoom { 0% { transform: scale(1); } 35% { transform: scale(1.5); } 60% { transform: scale(3.2); } 80% { transform: scale(10); } 100% { transform: scale(70); } }
+@keyframes intro-end { to { visibility: hidden; } }
 
 /* ——— página do produto: informações entram em sequência e a barra de compra sobe ——— */
 .pinfo.enter > * { animation: p-in .8s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 70ms + .35s); }

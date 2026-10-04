@@ -142,7 +142,7 @@ tools/textura/        gerador da textura de pedra
 - **Transições cinematográficas** (View Transitions; Chrome e Safari do iOS 18.2+; nos outros a página troca normal):
   - abrir produto: a maçã do logo cresce do centro revelando a página e a foto do aparelho voa do cartão para a galeria;
   - voltar ("‹ Catálogo" usa o histórico quando veio do catálogo): o produto se fecha na maçã e a foto volta para o cartão, na mesma rolagem;
-  - abertura da marca (1ª tela de cada visita): logo cromado com brilho e o site surge pela maçã; o topo espera (`--intro`);
+  - abertura da marca (1ª tela de cada visita): o logo cromado surge no centro, a maçã prateada perde o preenchimento e vira a janela para o site, e o conjunto cresce a partir da maçã até ela tomar a tela (um SVG só: fundo preto com a maçã recortada + letras; zoom com origem no centro da maçã). Os iPhones do topo já sobem dentro dela (`--intro`);
   - filtros: os cartões deslizam para o lugar novo;
   - para a foto voar, a tela nova precisa nascer desenhada: o catálogo fica em cache na sessão (`imprts.vitrine`), o `app.js` tem `blocking="render"` e roda o `init` assim que executa (não espera o `DOMContentLoaded`). `html[data-vt]` guarda a última transição ("ida"/"volta").
 - **Limite do WhatsApp:** não existe como o site anexar uma imagem numa mensagem para um número específico. Por isso a ficha vai como link com prévia.
