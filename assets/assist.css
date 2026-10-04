@@ -124,6 +124,12 @@ html.intro .a-hero { --intro: .7s; }
 .q-sug .tx b { display: block; font-size: 15px; font-weight: 600; }
 .q-sug .tx small { font-size: 12px; color: var(--faint); }
 @keyframes sug-in { from { opacity: 0; transform: translateY(-6px); } }
+.q-find { scroll-margin-top: 74px; }
+.q-sug li { touch-action: pan-y; }
+/* no celular a lista é parte da página (rola com a página, mesmo sem teclado); no computador é uma caixa suspensa */
+@media (max-width: 640px) {
+  .q-sug { position: static; max-height: none; overflow: visible; margin-top: 8px; box-shadow: none; }
+}
 
 /* escolhido: a foto oficial entra e fica respirando; dá para trocar a cor */
 .q-picked { display: grid; gap: 4px; margin-top: 16px; padding: 22px 20px 24px; border-radius: var(--r-lg); background: var(--surface); text-align: center; animation: pk-in .6s var(--e-apple); }
@@ -208,3 +214,4 @@ html[data-site="assist"] footer { padding-bottom: 120px; }
 .qt-sum .qt-tag { grid-column: 1 / -1; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
 .qt-sum .qt-dev { font-weight: 600; font-size: 16px; }
 .qt-sum .qt-iss { font-size: 13.5px; color: var(--dim); }
+.q-picked[hidden], .q-sug[hidden], .q-clear[hidden] { display: none; }

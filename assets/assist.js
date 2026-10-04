@@ -50,7 +50,7 @@
         <span class="th">${m.img ? `<img src="${esc(m.img)}?v=3" alt="" loading="lazy" decoding="async">` : "?"}</span>
         <span class="tx"><b>${esc(m.name)}</b><small>${esc(m.year)}</small></span></li>`).join("");
     sug.hidden = false; find.setAttribute("aria-expanded", "true");
-    $$("li", sug).forEach(li => li.addEventListener("pointerdown", e => { e.preventDefault(); pick(shown[+li.dataset.i]); }));
+    $$("li", sug).forEach(li => li.addEventListener("click", () => pick(shown[+li.dataset.i])));
   }
   function close() { sug.hidden = true; find.setAttribute("aria-expanded", "false"); find.removeAttribute("aria-activedescendant"); }
   function move(d) {
@@ -59,9 +59,16 @@
     $$("li", sug).forEach((li, i) => li.classList.toggle("on", i === active));
     const li = $(`#sg${active}`); li?.scrollIntoView({ block: "nearest" }); find.setAttribute("aria-activedescendant", li ? li.id : "");
   }
-  find.addEventListener("focus", () => list(find.value));
+  const phoneSize = matchMedia("(max-width: 640px)");
+  find.addEventListener("focus", () => {
+    list(find.value);
+    // no celular a busca sobe para o topo da tela, para os resultados caberem acima do teclado
+    if (phoneSize.matches) setTimeout(() => $(".q-find").scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" }), 280);
+  });
   find.addEventListener("input", () => { clear.hidden = !find.value; list(find.value); });
-  find.addEventListener("blur", () => setTimeout(close, 120));
+  // tocar no campo sempre reabre a lista (no Android o campo continua focado depois de baixar o teclado)
+  find.addEventListener("click", () => { if (sug.hidden) list(find.value); });
+  document.addEventListener("pointerdown", e => { if (!sug.hidden && !e.target.closest(".q-find")) close(); });
   find.addEventListener("keydown", e => {
     if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
     else if (e.key === "ArrowUp") { e.preventDefault(); move(-1); }
@@ -82,7 +89,8 @@
     picked.hidden = false;
     paint();
     sync();
-    if (!calm) picked.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // a lista (comprida no celular) some: volta para a busca, com a foto escolhida logo abaixo
+    requestAnimationFrame(() => $(".q-find").scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" }));
   }
   function paint() {
     const img = $("#pk-img");
