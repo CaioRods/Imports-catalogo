@@ -320,10 +320,10 @@
     $$("img", root).forEach(img => img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = 1; img.src = "img/placeholder.png"; } });
   }
 
-  /* ——— "Tenho interesse" (o formulário só carrega no primeiro toque) ——— */
+  /* ——— "Tenho interesse" e a conta (o formulário só carrega no primeiro toque) ——— */
   let interesse;
-  function want(p, b) {
-    if (window.IMPRTS_INTERESSE) return window.IMPRTS_INTERESSE.open(p);
+  function withForm(b, fn) {
+    if (window.IMPRTS_INTERESSE) return fn(window.IMPRTS_INTERESSE);
     b.classList.add("busy");
     interesse = interesse || new Promise((ok, no) => {
       const s = document.createElement("script");
@@ -331,8 +331,24 @@
       s.onload = ok; s.onerror = no;
       document.head.appendChild(s);
     });
-    interesse.then(() => { b.classList.remove("busy"); window.IMPRTS_INTERESSE.open(p); }).catch(() => { b.classList.remove("busy"); interesse = null; });
+    interesse.then(() => { b.classList.remove("busy"); fn(window.IMPRTS_INTERESSE); }).catch(() => { b.classList.remove("busy"); interesse = null; });
   }
+  const want = (p, b) => withForm(b, f => f.open(p));
+
+  /* ——— conta neste celular: nome, telefone e e-mail ficam guardados no aparelho ——— */
+  const CONTA = "imprts.cliente";
+  const conta = () => { try { const c = JSON.parse(localStorage.getItem(CONTA)); return c && c.name && c.phone ? c : null; } catch { return null; } };
+  const initials = name => name.trim().split(/\s+/).filter(Boolean).map(w => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join("").toUpperCase();
+  function contaBtn() {
+    const c = conta();
+    $$("[data-conta]").forEach(b => {
+      b.classList.toggle("on", !!c);
+      b.innerHTML = c ? esc(initials(c.name)) : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>';
+      b.setAttribute("aria-label", c ? `Sua conta: ${c.name}` : "Salvar seus dados neste celular");
+    });
+  }
+  addEventListener("imprts:conta", contaBtn);
+  addEventListener("storage", e => { if (e.key === CONTA) contaBtn(); });
   window.IMPRTS_UI = { money, esc, code, images, promo, now, wa, waIcon, flush, visitor, CONDITION, PARTS };
 
   function contacts() {
@@ -348,6 +364,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     contacts();
+    contaBtn();
+    $$("[data-conta]").forEach(b => b.addEventListener("click", () => withForm(b, f => f.account())));
     visit();
     renderSeals();
     if (document.body.dataset.page === "home") home();

@@ -197,32 +197,28 @@
     return lines.filter(l => l !== null).join("\n");
   }
 
-  /* ——— janela ——— */
-  function open(p) {
-    const s = saved();
+  /* ——— conta neste celular: os dados ficam guardados no aparelho e preenchem o "Tenho interesse" ——— */
+  const clean = c => ({ name: String(c.name || "").trim().replace(/\s+/g, " "), phone: onlyDigits(c.phone).replace(/^55(?=\d{10,11}$)/, ""), email: String(c.email || "").trim() });
+  function check(c) {
+    if (c.name.split(" ").length < 2 || c.name.length < 5) return "Digite o nome completo (nome e sobrenome).";
+    if (c.phone.length < 10 || c.phone.length > 11) return "Confira o telefone com DDD.";
+    if (c.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email)) return "Confira o e-mail ou deixe em branco.";
+    return "";
+  }
+  const account0 = () => { const c = clean(saved()); return check(c) ? null : c; }; // conta completa ou nada
+  const changed = () => dispatchEvent(new Event("imprts:conta")); // atualiza o botão da conta no menu
+  function store(c) { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch {} changed(); }
+  function forget() { try { localStorage.removeItem(KEY); } catch {} changed(); }
+  const fields = s => `
+    <label>Nome completo<input name="name" autocomplete="name" placeholder="Seu nome e sobrenome" value="${esc(s.name || "")}" required></label>
+    <label>Telefone (WhatsApp)<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(18) 99999-9999" value="${esc(maskPhone(s.phone || ""))}" required></label>
+    <label>Gmail <span>(opcional)</span><input name="email" type="email" inputmode="email" autocomplete="email" placeholder="voce@gmail.com" value="${esc(s.email || "")}"></label>`;
+
+  /* ——— janela (folha de baixo no celular, janela central no computador) ——— */
+  function sheet(inner) {
     const el = document.createElement("div");
     el.className = "sheet-bg";
-    el.innerHTML = `
-      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t">
-        <button class="sheet-x" aria-label="Fechar">×</button>
-        <div class="sh-step s1">
-          <h2 id="sheet-t">Tenho interesse</h2>
-          <p class="sheet-sub">Deixe seus dados e a IMPRTS recebe a ficha completa do <b>${esc(p.name)}</b> no WhatsApp.</p>
-          <label>Nome completo<input name="name" autocomplete="name" placeholder="Seu nome e sobrenome" value="${esc(s.name || "")}" required></label>
-          <label>Telefone (WhatsApp)<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(18) 99999-9999" value="${esc(maskPhone(s.phone || ""))}" required></label>
-          <label>Gmail <span>(opcional)</span><input name="email" type="email" inputmode="email" autocomplete="email" placeholder="voce@gmail.com" value="${esc(s.email || "")}"></label>
-          <p class="sheet-err" hidden></p>
-          <button class="btn metal go">Continuar</button>
-          <p class="sheet-note">Seus dados são usados só pela IMPRTS para falar com você sobre este aparelho.</p>
-        </div>
-        <div class="sh-step s2" hidden>
-          <h2>Confirmar interesse?</h2>
-          <p class="sheet-sub">Esta ficha e os seus dados vão para o WhatsApp da IMPRTS.</p>
-          <div class="ficha"><div class="ficha-load"></div></div>
-          <p class="sheet-err" hidden></p>
-          <div class="sheet-row"><button class="btn back">Voltar</button><button class="btn wa send">${U.waIcon()} Confirmar e enviar</button></div>
-        </div>
-      </div>`;
+    el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t"><button class="sheet-x" aria-label="Fechar">×</button>${inner}</div>`;
     document.body.appendChild(el);
     document.documentElement.classList.add("noscroll");
     requestAnimationFrame(() => el.classList.add("on"));
@@ -231,32 +227,85 @@
     el.addEventListener("click", e => { if (e.target === el) close(); });
     $(".sheet-x", el).onclick = close;
     addEventListener("keydown", onKey);
-
     const f = n => $(`input[name=${n}]`, el);
-    f("phone").addEventListener("input", e => { e.target.value = maskPhone(e.target.value); });
-    setTimeout(() => (f("name").value ? f("phone") : f("name")).focus(), 350);
+    f("phone")?.addEventListener("input", e => { e.target.value = maskPhone(e.target.value); });
+    const read = () => clean({ name: f("name").value, phone: f("phone").value, email: f("email").value });
+    const err = (where, t) => { const e = $(`${where} .sheet-err`, el); e.textContent = t; e.hidden = !t; };
+    return { el, close, f, read, err };
+  }
+
+  /* ——— "Sua conta": ver, alterar ou apagar os dados deste celular ——— */
+  function account() {
+    const s = account0();
+    const { el, close, f, read, err } = sheet(`
+      <div class="acc">
+        <h2 id="sheet-t">${s ? "Sua conta" : "Seus dados"}</h2>
+        <p class="sheet-sub">Ficam guardados só neste celular. Assim, no <b>Tenho interesse</b>, você não precisa digitar de novo.</p>
+        ${fields(s || saved())}
+        <p class="sheet-err" hidden></p>
+        <button class="btn metal save">Salvar</button>
+        ${s ? '<button class="btn forget">Sair deste celular</button>' : ""}
+        <p class="sheet-note">Seus dados são usados só pela IMPRTS para falar com você.</p>
+      </div>`);
+    if (!s) setTimeout(() => f("name").focus(), 350);
+    $(".save", el).onclick = () => {
+      const c = read(), e = check(c);
+      if (e) return err(".acc", e);
+      store(c); close();
+    };
+    const fg = $(".forget", el);
+    if (fg) fg.onclick = () => { forget(); close(); };
+  }
+
+  /* ——— "Tenho interesse": com conta salva vai direto para a ficha ——— */
+  function open(p) {
+    const s = account0();
+    const { el, close, f, read, err } = sheet(`
+        <div class="sh-step s1"${s ? " hidden" : ""}>
+          <h2 id="sheet-t">Tenho interesse</h2>
+          <p class="sheet-sub">Deixe seus dados e a IMPRTS recebe a ficha completa do <b>${esc(p.name)}</b> no WhatsApp. Eles ficam guardados neste celular para as próximas vezes.</p>
+          ${fields(s || saved())}
+          <p class="sheet-err" hidden></p>
+          <button class="btn metal go">Continuar</button>
+          <p class="sheet-note">Seus dados são usados só pela IMPRTS para falar com você sobre este aparelho.</p>
+        </div>
+        <div class="sh-step s2" hidden>
+          <h2>Confirmar interesse?</h2>
+          <p class="sheet-sub">Esta ficha e os seus dados vão para o WhatsApp da IMPRTS.</p>
+          <p class="sheet-who"></p>
+          <div class="ficha"><div class="ficha-load"></div></div>
+          <p class="sheet-err" hidden></p>
+          <div class="sheet-row"><button class="btn back">${s ? "Cancelar" : "Voltar"}</button><button class="btn wa send">${U.waIcon()} Confirmar e enviar</button></div>
+        </div>`);
 
     let client, card;
-    const err = (step, t) => { const e = $(`.${step} .sheet-err`, el); e.textContent = t; e.hidden = !t; };
-
-    $(".go", el).onclick = async () => {
-      const name = f("name").value.trim().replace(/\s+/g, " ");
-      const phone = onlyDigits(f("phone").value);
-      const email = f("email").value.trim();
-      if (name.split(" ").length < 2 || name.length < 5) return err("s1", "Digite o nome completo (nome e sobrenome).");
-      if (phone.length < 10 || phone.length > 11) return err("s1", "Confira o telefone com DDD.");
-      if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err("s1", "Confira o e-mail ou deixe em branco.");
-      err("s1", "");
-      client = { name, phone, email };
-      try { localStorage.setItem(KEY, JSON.stringify(client)); } catch {}
+    async function confirm(c) {
+      client = c; card = null;
       $(".s1", el).hidden = true; $(".s2", el).hidden = false;
+      $(".sheet-who", el).innerHTML = `Enviando como <b>${esc(c.name)}</b> · ${esc(maskPhone(c.phone))} <button class="linkbtn edit">Alterar</button>`;
+      $(".edit", el).onclick = edit;
       const box = $(".ficha", el);
       box.innerHTML = '<div class="ficha-load"></div>';
-      card = await renderCard(p, client);
-      card.className = "ficha-img";
+      const cv = await renderCard(p, c);
+      if (client !== c) return; // mudou os dados enquanto desenhava
+      card = cv; card.className = "ficha-img";
       box.innerHTML = ""; box.appendChild(card);
+    }
+    function edit() {
+      $(".s2", el).hidden = true; $(".s1", el).hidden = false;
+      setTimeout(() => f("name").focus(), 50);
+    }
+
+    $(".go", el).onclick = () => {
+      const c = read(), e = check(c);
+      if (e) return err(".s1", e);
+      err(".s1", "");
+      store(c);
+      confirm(c);
     };
-    $(".back", el).onclick = () => { $(".s2", el).hidden = true; $(".s1", el).hidden = false; };
+    // "Cancelar" quando já abriu na ficha (conta salva); "Voltar" quando veio dos dados
+    $(".back", el).onclick = () => (s ? close() : edit());
+    if (s) confirm(s); else setTimeout(() => (f("name").value ? f("phone") : f("name")).focus(), 350);
 
     $(".send", el).onclick = async e => {
       const b = e.currentTarget;
@@ -267,7 +316,7 @@
         id = await withTimeout(rpc("site_lead", { p_name: client.name, p_phone: "55" + client.phone, p_email: client.email || null, p_visitor: U.visitor, p_code: p.code }), 6000);
       } catch (x) {
         // dá tempo de ler o aviso antes de abrir o WhatsApp
-        if (String(x).includes("muitos pedidos")) { err("s2", "Você já enviou vários pedidos agora. Fale direto pelo WhatsApp da loja."); wait = 2500; }
+        if (String(x).includes("muitos pedidos")) { err(".s2", "Você já enviou vários pedidos agora. Fale direto pelo WhatsApp da loja."); wait = 2500; }
       }
       if (wait) await new Promise(ok => setTimeout(ok, wait));
       if (id) {
@@ -283,5 +332,5 @@
     };
   }
 
-  window.IMPRTS_INTERESSE = { open };
+  window.IMPRTS_INTERESSE = { open, account };
 })();

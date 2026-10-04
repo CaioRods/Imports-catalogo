@@ -65,6 +65,14 @@ body { position: relative; }
 .nav.scrolled { border-bottom-color: var(--hair); background: rgba(0,0,0,.72); }
 .nav-links { display: flex; gap: 22px; font-size: 14px; color: var(--dim); }
 .nav-links a:hover { color: var(--text); }
+.nav-links { align-items: center; }
+/* conta neste celular: ícone de pessoa ou as iniciais */
+.acct { flex: none; width: 30px; height: 30px; margin: -4px 0; padding: 0; border-radius: 50%; border: 1px solid var(--hair-strong); background: transparent; color: var(--dim);
+  display: grid; place-items: center; cursor: pointer; font: 600 11.5px var(--font); letter-spacing: .02em; transition: background .2s, color .2s, border-color .2s, transform .2s var(--ease); }
+.acct:hover { color: var(--text); border-color: rgba(255,255,255,.35); }
+.acct:active { transform: scale(.92); }
+.acct svg { width: 15px; height: 15px; }
+.acct.on { background: linear-gradient(180deg, #fafafa, #c9cacd); color: #0a0a0b; border-color: transparent; }
 @media (max-width: 640px) { .nav-links .hide-m { display: none; } }
 
 /* ——— botões ——— */
@@ -347,6 +355,10 @@ html.noscroll { overflow: hidden; }
 .sheet .btn { width: 100%; justify-content: center; margin-top: 6px; }
 .sheet-row { display: flex; gap: 10px; }
 .sheet-row .btn.back { flex: 0 0 34%; }
+.sheet-who { margin: -6px 0 14px; font-size: 13.5px; color: var(--dim); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.sheet-who b { color: var(--text); font-weight: 600; }
+.linkbtn { appearance: none; border: 0; background: none; padding: 4px 2px; color: var(--text); font: 600 13.5px var(--font); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.sheet .btn.forget { background: transparent; border-color: transparent; color: #ff6b6b; margin-top: 4px; }
 .sheet-err { color: #ff6b6b; font-size: 13.5px; margin: 0 0 12px; }
 .sheet-note { color: var(--faint); font-size: 12px; line-height: 1.5; margin: 14px 0 0; text-align: center; }
 .ficha { position: relative; aspect-ratio: 1080 / 1350; width: 100%; max-height: 52vh; margin: 0 auto 16px; border-radius: 18px; overflow: hidden; border: 1px solid var(--hair); background: #0b0b0d; display: flex; justify-content: center; }
