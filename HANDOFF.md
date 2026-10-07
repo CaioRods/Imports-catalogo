@@ -2,7 +2,7 @@
 
 > Para outra pessoa ou IA continuar **exatamente de onde o trabalho parou**, nos **dois sistemas**:
 > o app de Mac da loja e o site. Leia tudo antes de mexer.
-> Última atualização: 4 de outubro de 2026, fim do dia. App na versão **1.21 (build 29)**. Site no ar em **https://importsbrasil.com** (loja) e **https://importsbrasil.com/assistencia** (assistência técnica).
+> Última atualização: 4 de outubro de 2026, fim do dia. App na versão **1.23 (build 31)**. Site no ar em **https://importsbrasil.com** (loja) e **https://importsbrasil.com/assistencia** (assistência técnica).
 > O que mudou nesta data está resumido na **seção 7**.
 
 ---
@@ -266,6 +266,8 @@ tools/textura/        gerador da textura de pedra
 - **1.19**: modelos novos (iPhone 17e/18/Duo, MacBook Neo/M5, DJI Avata), 3D, Organizar estoque.
 - **1.20**: fotos do site com recorte, promoções, cores da bateria.
 - **1.21**: tela Clientes, Visual dos aparelhos (3D/2D/Fotos).
+- **1.22**: correção: peças Tela, Câmera frontal, Alto-falante, Microfone e Conector voltaram no cadastro (um `case ... where` só valia para o último padrão e escondia essas peças fora dos drones).
+- **1.23**: Siri com botões de microfone (mutar: não ouve nada; `Settings.siriMuted`) e de som (voz; `Settings.siriSpeaks`) no menu lateral.
 
 
 ---
@@ -308,3 +310,21 @@ tools/textura/        gerador da textura de pedra
 7. **IMPORTS Assistência** (`/assistencia`): só iPhone, design Apple claro/escuro, logo com chave fixa e chave de fenda, busca de iPhone com foto e cor, sintomas, relatório no WhatsApp marcado como `IMPORTS ASSISTÊNCIA`.
 8. **Texto da marca corrigido para IMPORTS** em todo o site.
 9. **Correções no iPhone:** lista da busca rolando com a página e sem fechar ao baixar o teclado; véu branco depois da abertura (brilho só nas letras + cortina removida no fim do zoom).
+
+
+---
+
+## Sistema IMPRTS para celular (app web) — `importsbrasil.com/sistema/oon0qbdj6w/`
+
+Versão web do sistema do Mac, feita para iPhone (instala pelo Safari → Compartilhar → **Adicionar à Tela de Início**; abre em tela cheia com o ícone da maçã). Usa **o mesmo banco** do Mac: o que muda no celular aparece nos Macs em segundos e vice-versa.
+
+- **Endereço:** `sistema/oon0qbdj6w/` (pasta deste repositório). `/sistema` sozinho redireciona para a loja. As páginas têm `noindex`.
+  O repositório é público, então o nome da pasta **não é segredo**: a proteção é o login da conta da loja + as regras de segurança do banco (`eh_loja()` em `supabase/banco-completo.sql`).
+- **Entrada:** e-mail e senha de uma conta que esteja em `contas_loja` (só uma vez por celular; a sessão fica salva) → escolha do perfil (Rafael, Funcionário, Caleb, com nome/foto de `kv profile.*`) → **o mesmo PIN do Mac** (`kv pins`: `sal:sha256(sal+pin)`). O PIN fica lembrado por 8 horas de uso.
+- **Telas:** Início, Estoque (busca, filtros, promoção, vender com recibo no WhatsApp, desfazer venda, excluir), Cadastrar/Editar (catálogo completo, cores, peças, IMEI com verificação, fotos com recorte e zoom → pasta `produtos`, descrição do site), Serviços (Fila, Conserto, Prontos, Histórico; ordem de serviço; aviso de "pronto" no WhatsApp; serviço "por fora" do Caleb), Orçamento (imagem para o cliente, numeração em `kv quotes`), Vendas (período, faturamento, lucro só para o dono, planilha), Clientes (`rpc site_stats`), Etiquetas (marcar como impressas — a impressão é no Mac), Valores (só dono; `kv pricebook`, mesma fórmula do `PriceBook.swift`), Ajustes (PIN, perfil, dados da loja, sair).
+- **Permissões:** iguais ao Mac (`ACCOUNTS` em `core.js`): Caleb só vê Serviços, Orçamento e Ajustes; custo e lucro só para o dono.
+- **Não faz (limite do celular):** leitura de iPhone pelo cabo, impressão na impressora de etiquetas do Mac, Siri por voz.
+- **Arquivos:** `index.html`, `app.css`, `app.js` (entrada, rotas, abas), `core.js` (login, banco, sincronização a cada 15 s, fotos, PIN, **modo demonstração** com `?demo`), `ui.js` (componentes), `telas-estoque.js`, `telas-servicos.js`, `telas-mais.js`, `catalogo.json` (exportado do app: `IMPRTS --export-catalog <arquivo>`; refazer quando o catálogo do Mac mudar), `manifest.webmanifest`, `sw.js`, ícones.
+- **Colunas:** `PCOLS`/`RCOLS` em `core.js` são as mesmas de `SyncEngine.swift`. Coluna nova no banco → mudar nos dois.
+- **Publicar mudança:** edite a pasta de origem e rode `python3 ~/Documents/IMPRTS/tools/versao-sistema.py <origem> sistema/oon0qbdj6w` — ela carimba `?v=` em todos os imports para os celulares pegarem a versão nova (não editar os `?v=` à mão: os módulos precisam ter o mesmo endereço em todos os arquivos).
+- **Testar sem mexer no banco:** abra `.../sistema/oon0qbdj6w/?demo` (dados de exemplo só na memória).

@@ -9,12 +9,37 @@
           "value": "public, max-age=604800"
         }
       ]
+    },
+    {
+      "source": "/sistema/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
     }
   ],
   "rewrites": [
     {
       "source": "/i/:code/:id",
       "destination": "/api/ficha?code=:code&id=:id"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/sistema",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/sistema/oon0qbdj6w",
+      "destination": "/sistema/oon0qbdj6w/",
+      "permanent": false
     }
   ]
 }

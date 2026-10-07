@@ -3,3 +3,4 @@
 tools/fotos-oficiais/estilizar
 tools/textura/pedra
 .vercel
+.env.local
