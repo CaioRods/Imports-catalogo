@@ -1,9 +1,9 @@
 // IMPRTS web — entrada, navegação e barra de abas.
-import { S, ACCOUNTS, DEMO, restoreSession, entrar, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791459951";
-import { $, icon, route, go, toast, watchScroll } from "./ui.js?v=1791459951";
-import * as E from "./telas-estoque.js?v=1791459951";
-import * as V from "./telas-servicos.js?v=1791459951";
-import * as M from "./telas-mais.js?v=1791459951";
+import { S, ACCOUNTS, DEMO, restoreSession, entrar, loadProfiles, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791462120";
+import { $, icon, route, go, toast, watchScroll } from "./ui.js?v=1791462120";
+import * as E from "./telas-estoque.js?v=1791462120";
+import * as V from "./telas-servicos.js?v=1791462120";
+import * as M from "./telas-mais.js?v=1791462120";
 
 const KEEP_PIN_HOURS = 8;
 const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
@@ -82,10 +82,13 @@ function chooseProfile() {
 
 // celular sem sessão: escolhe o perfil e o PIN é conferido no servidor, que devolve a sessão da conta da loja
 function firstEntry() {
-  M.profileScreen(acct => M.pinScreen(acct, () => {
+  const pick = () => M.profileScreen(acct => M.pinScreen(acct, () => {
     store.set("imprts.web.user", { id: acct.id, at: Date.now() });
     afterLogin();
   }, firstEntry, entrar));
+  // mostra na hora (com o que já estava guardado) e de novo quando as fotos chegam
+  pick();
+  loadProfiles().then(() => { if (!S.user && !S.session && $(".avatars")) pick(); });
 }
 
 async function afterLogin() {

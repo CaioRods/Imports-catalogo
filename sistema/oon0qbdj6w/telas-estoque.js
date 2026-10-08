@@ -1,8 +1,8 @@
 // IMPRTS web — Início, Estoque, produto, cadastro, venda e etiquetas.
-import { S, createProduct, updateProduct, uploadPhoto, removePhoto, photoURL, logActivity, setKV } from "./core.js?v=1791459951";
+import { S, createProduct, updateProduct, uploadPhoto, removePhoto, photoURL, logActivity, setKV } from "./core.js?v=1791462120";
 import { $, $$, esc, money, code, icon, toast, sheet, confirmSheet, go, topbar, thumb, battery, priceHTML, promoOn, statusPill,
   model, colorOf, coverURL, autoName, applicableParts, partName, chips, bindChips, parseMoney, moneyInput, fmtDate, fmtDateTime, ago,
-  avatar, profile, phoneMask, digits, waLink, luhnOK, catIcon } from "./ui.js?v=1791459951";
+  avatar, profile, phoneMask, digits, waLink, luhnOK, catIcon } from "./ui.js?v=1791462120";
 
 const norm = s => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 const alive = () => S.products.filter(p => !p.deleted);
@@ -85,9 +85,15 @@ export function produto(id) {
   const p = S.products.find(x => x.id === id);
   if (!p) return `<div class="screen">${topbar({ title: "Produto", back: "#/estoque" })}<div class="empty">Produto não encontrado.</div></div>`;
   const parts = Object.entries(p.parts || {});
+  // mesma ordem do site: capa escolhida, imagem oficial do modelo, depois as outras fotos
+  const photos = Array.isArray(p.photos) ? p.photos : [], cover = p.cover && photos.includes(p.cover) ? p.cover : null;
   const u = coverURL(p);
-  const imgs = [u ? `<div class="hero-img">${`<img src="${esc(u)}" alt="" onerror="this.parentNode.classList.add('noimg')">`}${catIcon(p.category)}</div>` : `<div class="hero-img noimg">${catIcon(p.category)}</div>`]
-    .concat((p.photos || []).map(f => `<div class="hero-img photo"><img src="${esc(photoURL(f))}" alt="" loading="lazy"></div>`));
+  const photo = f => `<div class="hero-img photo"><img src="${esc(photoURL(f))}" alt="" loading="lazy"></div>`;
+  const imgs = (cover ? [photo(cover)] : [])
+    // imagem oficial que não existe: some se houver fotos, senão vira o ícone
+    .concat(u ? [`<div class="hero-img"><img src="${esc(u)}" alt="" onerror="${photos.length ? "this.parentNode.remove()" : "this.parentNode.classList.add('noimg')"}">${catIcon(p.category)}</div>`] : [])
+    .concat(photos.filter(f => f !== cover).map(photo));
+  if (!imgs.length) imgs.push(`<div class="hero-img noimg">${catIcon(p.category)}</div>`);
   const rows = [
     ["Código", code(p.code)], ["Situação", statusPill(p.status)], ["Condição", (S.catalog.conditions.find(c => c.id === p.condition) || {}).title],
     ["Armazenamento", p.storage], ["Chip", p.chip], ["Memória", p.ram], ["Bateria", p.battery_health != null ? battery(p.battery_health) : null],

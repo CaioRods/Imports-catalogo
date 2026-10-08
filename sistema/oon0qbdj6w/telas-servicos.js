@@ -1,8 +1,8 @@
 // IMPRTS web — Serviços (ordens de serviço), Orçamento e tabela de Valores.
-import { S, createRepair, updateRepair, setKV } from "./core.js?v=1791459951";
+import { S, createRepair, updateRepair, setKV } from "./core.js?v=1791462120";
 import { $, $$, esc, money, osNum, icon, toast, sheet, confirmSheet, go, topbar, model, chips, bindChips, parseMoney, moneyInput,
-  fmtDate, fmtDateTime, ago, avatar, profile, phoneMask, digits, waLink, applicableParts, partName } from "./ui.js?v=1791459951";
-import { run } from "./telas-estoque.js?v=1791459951";
+  fmtDate, fmtDateTime, ago, avatar, profile, phoneMask, digits, waLink, applicableParts, partName } from "./ui.js?v=1791462120";
+import { run } from "./telas-estoque.js?v=1791462120";
 
 const norm = s => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 const isCaleb = () => S.user?.id === "caleb";

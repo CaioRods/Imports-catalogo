@@ -1,6 +1,6 @@
 // IMPRTS web: guarda a "casca" do app para abrir rápido (os dados sempre vêm do banco).
-const CACHE = "imprts-web-1791459951";
-const SHELL = ["./", "index.html", "app.css?v=1791459951", "app.js?v=1791459951", "core.js?v=1791459951", "ui.js?v=1791459951", "telas-estoque.js?v=1791459951", "telas-servicos.js?v=1791459951", "telas-mais.js?v=1791459951", "catalogo.json", "icone-180.png", "icone-192.png", "icone-512.png", "manifest.webmanifest"];
+const CACHE = "imprts-web-1791462120";
+const SHELL = ["./", "index.html", "app.css?v=1791462120", "app.js?v=1791462120", "core.js?v=1791462120", "ui.js?v=1791462120", "telas-estoque.js?v=1791462120", "telas-servicos.js?v=1791462120", "telas-mais.js?v=1791462120", "catalogo.json", "icone-180.png", "icone-192.png", "icone-512.png", "manifest.webmanifest"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

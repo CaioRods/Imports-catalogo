@@ -62,7 +62,24 @@ async function sessao() {
   return { access_token: s.access_token, refresh_token: s.refresh_token, expires_in: s.expires_in, email: s.user?.email };
 }
 
+// GET: só nome e foto dos perfis, para a tela "Quem está usando?" antes de entrar
+async function perfis(res) {
+  try {
+    const s = await sessao();
+    const keys = CONTAS.map(c => `"profile.${c}"`).join(",");
+    const r = await fetch(`${SUPABASE}/rest/v1/kv?key=in.(${encodeURIComponent(keys)})&select=key,value`, { headers: { apikey: ANON, Authorization: `Bearer ${s.access_token}` } });
+    if (!r.ok) throw new Error(`kv: ${r.status}`);
+    const out = {};
+    for (const row of await r.json()) { const v = row.value || {}; out[row.key.slice(8)] = { name: v.name || null, photo: v.photo || null }; }
+    return reply(res, 200, out);
+  } catch (e) {
+    console.error(e);
+    return reply(res, 500, { erro: "servidor" });
+  }
+}
+
 module.exports = async function handler(req, res) {
+  if (req.method === "GET") return perfis(res);
   if (req.method !== "POST") return reply(res, 405, { erro: "metodo" });
   let body = req.body;
   if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }

@@ -1,5 +1,5 @@
 // IMPRTS web — peças de interface reaproveitadas pelas telas.
-import { S } from "./core.js?v=1791459951";
+import { S, photoURL } from "./core.js?v=1791462120";
 
 export const $ = (s, el = document) => el.querySelector(s);
 export const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -127,10 +127,17 @@ export const go = (page, arg) => { location.hash = "#/" + page + (arg != null ? 
 export function model(id) { return S.catalog?.byId[id] || null; }
 export function colorOf(p) { const m = model(p.model_id); return m?.colors.find(c => c.id === p.color_id) || null; }
 export function coverURL(p) { return p.model_id && p.color_id ? `/img/modelos/${p.model_id}/${p.color_id}.webp?v=3` : ""; }
+// imagem principal, como no site: a capa escolhida, senão a oficial do modelo, senão a primeira foto
+export function mainImage(p) {
+  const photos = Array.isArray(p.photos) ? p.photos : [];
+  if (p.cover && photos.includes(p.cover)) return photoURL(p.cover);
+  return coverURL(p) || (photos[0] ? photoURL(photos[0]) : "");
+}
 export function thumb(p, cls = "thumb") {
-  const u = coverURL(p);
-  // sem foto (ou se ela não carregar) aparece o ícone da categoria
-  return `<div class="${cls}${u ? "" : " noimg"}">${u ? `<img src="${esc(u)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('noimg')">` : ""}${catIcon(p.category)}</div>`;
+  const u = mainImage(p);
+  // se a imagem oficial não existir (ex.: Samsung), tenta a primeira foto; sem nada aparece o ícone da categoria
+  const alt = Array.isArray(p.photos) && p.photos[0] ? photoURL(p.photos[0]) : "";
+  return `<div class="${cls}${u ? "" : " noimg"}">${u ? `<img src="${esc(u)}" data-alt="${alt && alt !== u ? esc(alt) : ""}" alt="" loading="lazy" onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=''}else this.parentNode.classList.add('noimg')">` : ""}${catIcon(p.category)}</div>`;
 }
 export function battery(b) {
   if (b == null) return "";

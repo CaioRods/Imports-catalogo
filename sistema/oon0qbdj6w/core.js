@@ -28,6 +28,17 @@ const store = {
   set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
 
+// nome e foto dos perfis antes de entrar (o resto do banco só depois do PIN); guarda para abrir rápido
+export async function loadProfiles() {
+  const put = o => { for (const [id, v] of Object.entries(o || {})) S.kv["profile." + id] = { ...(S.kv["profile." + id] || {}), ...v }; };
+  put(store.get("imprts.web.perfis"));
+  if (DEMO) return;
+  try {
+    const r = await fetch("/api/sistema-entrar", { signal: AbortSignal.timeout(5000) });
+    if (r.ok) { const o = await r.json(); store.set("imprts.web.perfis", o); put(o); }
+  } catch {}
+}
+
 // ——— entrada: perfil + PIN, conferido no servidor (api/sistema-entrar.js), que devolve a sessão da conta da loja ———
 // Devolve true se entrou, false se o PIN está errado; outros casos viram erro com a mensagem para a tela.
 export async function entrar(conta, pin) {
