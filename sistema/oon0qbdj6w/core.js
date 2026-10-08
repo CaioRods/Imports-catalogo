@@ -54,6 +54,8 @@ async function token() {
   if (DEMO) return "demo";
   if (!S.session) throw new Error("sem sessão");
   if (Date.now() < S.session.expires_at - 60000) return S.session.access_token;
+  // acesso criado pelo servidor (sem renovação): venceu, pede o PIN de novo
+  if (!S.session.refresh_token) { const e = new Error("Sessão expirada. Entre de novo."); e.auth = true; throw e; }
   refreshing = refreshing || (async () => {
     const r = await fetch(`${CLOUD.url}/auth/v1/token?grant_type=refresh_token`, {
       method: "POST", headers: { apikey: CLOUD.key, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: S.session.refresh_token }),
@@ -116,7 +118,7 @@ export async function sync(full = false) {
 let timer = null;
 export function startSync() {
   stopSync();
-  const tick = () => sync().catch(e => { if (e.auth) { emit(); } S.online = navigator.onLine; emit(); });
+  const tick = () => sync().catch(e => { if (e.auth) { logout(); location.reload(); return; } S.online = navigator.onLine; emit(); });
   timer = setInterval(() => { if (!document.hidden) tick(); }, 15000);
   document.addEventListener("visibilitychange", onVis);
   addEventListener("online", tick);

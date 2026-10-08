@@ -1,9 +1,9 @@
 // IMPRTS web — entrada, navegação e barra de abas.
-import { S, ACCOUNTS, DEMO, restoreSession, entrar, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791454889";
-import { $, icon, route, go, toast, watchScroll } from "./ui.js?v=1791454889";
-import * as E from "./telas-estoque.js?v=1791454889";
-import * as V from "./telas-servicos.js?v=1791454889";
-import * as M from "./telas-mais.js?v=1791454889";
+import { S, ACCOUNTS, DEMO, restoreSession, entrar, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791459951";
+import { $, icon, route, go, toast, watchScroll } from "./ui.js?v=1791459951";
+import * as E from "./telas-estoque.js?v=1791459951";
+import * as V from "./telas-servicos.js?v=1791459951";
+import * as M from "./telas-mais.js?v=1791459951";
 
 const KEEP_PIN_HOURS = 8;
 const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };

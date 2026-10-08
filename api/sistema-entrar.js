@@ -1,11 +1,20 @@
 // Entrada do sistema do celular só com perfil + PIN.
-// O e-mail e a senha da conta da loja ficam aqui no servidor (variáveis IMPRTS_EMAIL e IMPRTS_SENHA
-// na Vercel), nunca no site. O PIN é conferido aqui, com a trava de erros do banco (pin_reservar),
-// e só com o PIN certo o celular recebe a sessão da conta da loja.
+// O servidor fala com o banco usando um segredo guardado na Vercel (nunca no site), de um destes jeitos:
+//   IMPRTS_JWT_SECRET: a "JWT Secret" (legada) do projeto no Supabase. Não precisa de conta: o servidor
+//     cria um acesso de 12 horas em nome da conta da loja mais antiga de contas_loja (a dos Macs).
+//     Quando vence, o celular pede o PIN de novo. Se estiver definida, vale mais que e-mail e senha.
+//   IMPRTS_EMAIL + IMPRTS_SENHA: e-mail e senha de uma conta da loja (alternativa).
+// O PIN é conferido aqui, com a trava de erros do banco (pin_reservar), e só com o PIN certo o celular
+// recebe o acesso.
 const crypto = require("crypto");
 const SUPABASE = "https://evaeprbbctemcnltjuwn.supabase.co";
 const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2YWVwcmJiY3RlbWNubHRqdXduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY4MTUsImV4cCI6MjEwNjE5MjgxNX0.IIhiVVFu4IdBm_Q8JN8GCftjW0r6wzrM0esHszjczVk";
 const CONTAS = ["rafael", "funcionario", "caleb"];
+const HORAS = 12;
+
+// tira espaço e aspas que às vezes vão junto ao colar na Vercel
+const limpa = v => String(v || "").trim().replace(/^["']|["']$/g, "");
+class Config extends Error {}
 
 function reply(res, status, body) {
   res.statusCode = status;
@@ -22,6 +31,37 @@ async function rpc(token, fn, args) {
   return t ? JSON.parse(t) : null;
 }
 
+const b64 = o => Buffer.from(typeof o === "string" ? o : JSON.stringify(o)).toString("base64url");
+function jwt(secret, claims) {
+  const now = Math.floor(Date.now() / 1000);
+  const body = b64({ alg: "HS256", typ: "JWT" }) + "." + b64({ iss: `${SUPABASE}/auth/v1`, iat: now, ...claims });
+  return body + "." + crypto.createHmac("sha256", secret).update(body).digest("base64url");
+}
+
+// Acesso da conta da loja: { access_token, refresh_token?, expires_in, email }
+async function sessao() {
+  const secret = limpa(process.env.IMPRTS_JWT_SECRET), email = limpa(process.env.IMPRTS_EMAIL), senha = limpa(process.env.IMPRTS_SENHA);
+  if (secret) {
+    const now = Math.floor(Date.now() / 1000);
+    const admin = jwt(secret, { role: "service_role", exp: now + 60 });
+    const r = await fetch(`${SUPABASE}/rest/v1/contas_loja?select=user_id,email&order=added_at.asc&limit=1`,
+      { headers: { apikey: ANON, Authorization: `Bearer ${admin}` } });
+    if (r.status === 401) throw new Config("A chave do servidor não confere com o banco (IMPRTS_JWT_SECRET)");
+    if (!r.ok) throw new Error(`contas_loja: ${r.status} ${await r.text()}`);
+    const c = (await r.json())[0];
+    if (!c) throw new Config("Nenhuma conta da loja em contas_loja");
+    const exp = now + HORAS * 3600;
+    return { access_token: jwt(secret, { aud: "authenticated", role: "authenticated", sub: c.user_id, email: c.email, exp }), expires_in: HORAS * 3600, email: c.email };
+  }
+  if (!email || !senha) throw new Config("Servidor sem a chave do banco configurada");
+  const r = await fetch(`${SUPABASE}/auth/v1/token?grant_type=password`, {
+    method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ email, password: senha }),
+  });
+  const s = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Config(`A conta da loja no servidor não entrou (${s.error_code || s.error || r.status})`);
+  return { access_token: s.access_token, refresh_token: s.refresh_token, expires_in: s.expires_in, email: s.user?.email };
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") return reply(res, 405, { erro: "metodo" });
   let body = req.body;
@@ -29,17 +69,8 @@ module.exports = async function handler(req, res) {
   const conta = String(body?.conta || ""), pin = String(body?.pin || "");
   if (!CONTAS.includes(conta) || !/^\d{4}$/.test(pin)) return reply(res, 400, { erro: "dados" });
 
-  // tira espaço e aspas que às vezes vão junto ao colar na Vercel
-  const limpa = v => String(v || "").trim().replace(/^["']|["']$/g, "");
-  const email = limpa(process.env.IMPRTS_EMAIL), senha = limpa(process.env.IMPRTS_SENHA);
-  if (!email || !senha) return reply(res, 500, { erro: "config", msg: "Servidor sem a conta da loja configurada" });
-
   try {
-    const r = await fetch(`${SUPABASE}/auth/v1/token?grant_type=password`, {
-      method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ email, password: senha }),
-    });
-    const s = await r.json().catch(() => ({}));
-    if (!r.ok) { console.error("login da loja falhou", r.status, s); return reply(res, 500, { erro: "config", msg: "A conta da loja no servidor não entrou", motivo: s.error_code || s.error || r.status }); }
+    const s = await sessao();
 
     const espera = await rpc(s.access_token, "pin_reservar", { p_conta: conta });
     if (espera > 0) return reply(res, 429, { erro: "bloqueado", segundos: espera });
@@ -54,9 +85,10 @@ module.exports = async function handler(req, res) {
     if (meu.length !== hash.length || !crypto.timingSafeEqual(Buffer.from(meu), Buffer.from(hash))) return reply(res, 401, { erro: "pin" });
 
     await rpc(s.access_token, "pin_acertou", { p_conta: conta });
-    return reply(res, 200, { access_token: s.access_token, refresh_token: s.refresh_token, expires_in: s.expires_in, user: { email: s.user?.email } });
+    return reply(res, 200, { access_token: s.access_token, refresh_token: s.refresh_token, expires_in: s.expires_in, user: { email: s.email } });
   } catch (e) {
     console.error(e);
+    if (e instanceof Config) return reply(res, 500, { erro: "config", msg: e.message });
     return reply(res, 500, { erro: "servidor", msg: "Não foi possível entrar agora" });
   }
 };

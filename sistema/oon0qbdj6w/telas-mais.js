@@ -1,7 +1,7 @@
 // IMPRTS web — Vendas, Clientes, Mais, Ajustes e a entrada (login, perfil e PIN).
-import { S, ACCOUNTS, logout, pinOf, checkPIN, setPIN, rpc, rest, setKV, DEMO } from "./core.js?v=1791454889";
-import { $, $$, esc, money, code, icon, toast, sheet, confirmSheet, go, topbar, thumb, fmtDate, fmtDateTime, ago, avatar, profile, phoneMask, digits, waLink, model } from "./ui.js?v=1791454889";
-import { run } from "./telas-estoque.js?v=1791454889";
+import { S, ACCOUNTS, logout, pinOf, checkPIN, setPIN, rpc, rest, setKV, DEMO } from "./core.js?v=1791459951";
+import { $, $$, esc, money, code, icon, toast, sheet, confirmSheet, go, topbar, thumb, fmtDate, fmtDateTime, ago, avatar, profile, phoneMask, digits, waLink, model } from "./ui.js?v=1791459951";
+import { run } from "./telas-estoque.js?v=1791459951";
 
 const isOwner = () => !!S.user?.owner;
 
