@@ -1,9 +1,9 @@
 // IMPRTS web — entrada, navegação e barra de abas.
-import { S, ACCOUNTS, DEMO, restoreSession, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791417342";
-import { $, icon, route, go, toast, watchScroll } from "./ui.js?v=1791417342";
-import * as E from "./telas-estoque.js?v=1791417342";
-import * as V from "./telas-servicos.js?v=1791417342";
-import * as M from "./telas-mais.js?v=1791417342";
+import { S, ACCOUNTS, DEMO, restoreSession, entrar, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791454889";
+import { $, icon, route, go, toast, watchScroll } from "./ui.js?v=1791454889";
+import * as E from "./telas-estoque.js?v=1791454889";
+import * as V from "./telas-servicos.js?v=1791454889";
+import * as M from "./telas-mais.js?v=1791454889";
 
 const KEEP_PIN_HOURS = 8;
 const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
@@ -80,11 +80,19 @@ function chooseProfile() {
   });
 }
 
+// celular sem sessão: escolhe o perfil e o PIN é conferido no servidor, que devolve a sessão da conta da loja
+function firstEntry() {
+  M.profileScreen(acct => M.pinScreen(acct, () => {
+    store.set("imprts.web.user", { id: acct.id, at: Date.now() });
+    afterLogin();
+  }, firstEntry, entrar));
+}
+
 async function afterLogin() {
   $("#app").innerHTML = `<div class="gate"><div class="spinner"></div><div class="sub mt">Carregando o estoque…</div></div>`;
   try { await sync(true); }
   catch (e) {
-    if (e.auth || e.status === 401) { logout(); return M.loginScreen(afterLogin); }
+    if (e.auth || e.status === 401) { logout(); return firstEntry(); }
     $("#app").innerHTML = `<div class="gate"><div class="sub">Sem conexão com o banco agora.</div><button class="btn ghost mt" style="max-width:240px" onclick="location.reload()">Tentar de novo</button></div>`;
     return;
   }
@@ -102,7 +110,7 @@ async function boot() {
   addEventListener("offline", () => toast("Sem internet: as mudanças não vão salvar até voltar", true));
   // usar o app renova o tempo do PIN
   addEventListener("pointerdown", () => { if (S.user) store.set("imprts.web.user", { id: S.user.id, at: Date.now() }); }, { passive: true });
-  if (DEMO) { await (await import("./core.js?v=1791417342")).login("demo@imprts", "demo"); return afterLogin(); }
-  if (restoreSession()) afterLogin(); else M.loginScreen(afterLogin);
+  if (DEMO) { await entrar("rafael", "0000"); return afterLogin(); }
+  if (restoreSession()) afterLogin(); else firstEntry();
 }
 boot();

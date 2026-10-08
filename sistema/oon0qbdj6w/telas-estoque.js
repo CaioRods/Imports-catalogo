@@ -1,8 +1,8 @@
 // IMPRTS web — Início, Estoque, produto, cadastro, venda e etiquetas.
-import { S, createProduct, updateProduct, uploadPhoto, removePhoto, photoURL, logActivity, setKV } from "./core.js?v=1791417342";
+import { S, createProduct, updateProduct, uploadPhoto, removePhoto, photoURL, logActivity, setKV } from "./core.js?v=1791454889";
 import { $, $$, esc, money, code, icon, toast, sheet, confirmSheet, go, topbar, thumb, battery, priceHTML, promoOn, statusPill,
   model, colorOf, coverURL, autoName, applicableParts, partName, chips, bindChips, parseMoney, moneyInput, fmtDate, fmtDateTime, ago,
-  avatar, profile, phoneMask, digits, waLink, luhnOK, catIcon } from "./ui.js?v=1791417342";
+  avatar, profile, phoneMask, digits, waLink, luhnOK, catIcon } from "./ui.js?v=1791454889";
 
 const norm = s => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 const alive = () => S.products.filter(p => !p.deleted);

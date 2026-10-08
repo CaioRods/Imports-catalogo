@@ -1,7 +1,7 @@
 // IMPRTS web — Vendas, Clientes, Mais, Ajustes e a entrada (login, perfil e PIN).
-import { S, ACCOUNTS, login, logout, pinOf, checkPIN, setPIN, rpc, rest, setKV, DEMO } from "./core.js?v=1791417342";
-import { $, $$, esc, money, code, icon, toast, sheet, confirmSheet, go, topbar, thumb, fmtDate, fmtDateTime, ago, avatar, profile, phoneMask, digits, waLink, model } from "./ui.js?v=1791417342";
-import { run } from "./telas-estoque.js?v=1791417342";
+import { S, ACCOUNTS, logout, pinOf, checkPIN, setPIN, rpc, rest, setKV, DEMO } from "./core.js?v=1791454889";
+import { $, $$, esc, money, code, icon, toast, sheet, confirmSheet, go, topbar, thumb, fmtDate, fmtDateTime, ago, avatar, profile, phoneMask, digits, waLink, model } from "./ui.js?v=1791454889";
+import { run } from "./telas-estoque.js?v=1791454889";
 
 const isOwner = () => !!S.user?.owner;
 
@@ -124,7 +124,7 @@ export function ajustes() {
 export function ajustesBind(root, rerender, onSwap) {
   $("#pin", root).onclick = () => pinSheet(rerender);
   $("#swap", root).onclick = onSwap;
-  $("#out", root).onclick = async () => { if (await confirmSheet("Sair deste celular?", "Para voltar, é preciso digitar o e-mail e a senha da conta da loja de novo.", "Sair", true)) { logout(); location.hash = ""; location.reload(); } };
+  $("#out", root).onclick = async () => { if (await confirmSheet("Sair deste celular?", "Para voltar, é só escolher o perfil e digitar o PIN de novo.", "Sair", true)) { logout(); location.hash = ""; location.reload(); } };
   $("#saveStore", root)?.addEventListener("click", () => run(() => setKV("store", { ...(S.kv.store || {}), whatsapp: digits($("#wa", root).value) ? "55" + digits($("#wa", root).value).replace(/^55/, "") : "", instagram: $("#ig", root).value.trim().replace(/^@/, ""), address: $("#addr", root).value.trim() }), "Dados da loja salvos"));
   $("#wa", root)?.addEventListener("input", e => e.target.value = phoneMask(e.target.value));
 }
@@ -140,44 +140,34 @@ function pinSheet(done) {
   };
 }
 
-// ————————————————— Entrada: login → perfil → PIN —————————————————
+// ————————————————— Entrada: perfil → PIN —————————————————
 const LOGO = `<svg class="logo" viewBox="-2 -2 449.64 85.73" role="img" aria-label="IMPRTS"><path fill="currentColor" d="M0.00 79.27L0.00 8.81L6.64 8.81L6.64 79.27ZM28.78 79.27L28.78 8.81L36.40 8.81L62.59 70.90L62.85 70.90L89.03 8.81L96.65 8.81L96.65 79.27L90.41 79.27L90.41 21.30L87.24 21.30L94.72 10.33L65.61 79.27L59.82 79.27L30.72 10.33L38.19 21.30L35.02 21.30L35.02 79.27ZM122.12 52.69L122.12 46.75L141.22 46.75Q149.39 46.75 154.00 42.49Q158.61 38.23 158.61 30.79L158.61 30.69Q158.61 23.20 154.00 18.97Q149.39 14.74 141.22 14.74L122.12 14.74L122.12 8.81L142.76 8.81Q149.49 8.81 154.57 11.52Q159.65 14.24 162.51 19.16Q165.38 24.07 165.38 30.63L165.38 30.72Q165.38 37.27 162.51 42.22Q159.65 47.17 154.57 49.93Q149.49 52.69 142.76 52.69ZM118.80 79.27L118.80 8.81L125.43 8.81L125.43 79.27ZM265.40 79.27L265.40 8.81L290.26 8.81Q297.14 8.81 302.19 11.34Q307.25 13.88 310.01 18.51Q312.78 23.13 312.78 29.42L312.78 29.52Q312.78 36.95 308.76 42.21Q304.74 47.47 297.68 49.34L314.78 79.27L307.01 79.27L290.82 50.37Q290.50 50.39 290.10 50.40Q289.70 50.42 289.36 50.42L272.03 50.42L272.03 79.27ZM272.03 44.51L289.73 44.51Q297.40 44.51 301.68 40.61Q305.95 36.70 305.95 29.65L305.95 29.55Q305.95 22.58 301.55 18.66Q297.15 14.74 289.46 14.74L272.03 14.74ZM350.84 79.27L350.84 14.81L327.55 14.81L327.55 8.81L380.77 8.81L380.77 14.81L357.48 14.81L357.48 79.27ZM420.32 80.38Q412.86 80.38 407.17 77.99Q401.47 75.61 398.13 71.22Q394.79 66.84 394.35 60.89L394.31 60.22L400.94 60.22L401.02 60.89Q401.53 64.95 404.07 67.95Q406.62 70.95 410.86 72.59Q415.10 74.24 420.66 74.24Q426.18 74.24 430.27 72.59Q434.36 70.94 436.62 67.91Q438.87 64.88 438.87 60.82L438.87 60.77Q438.87 55.56 435.32 52.47Q431.77 49.37 423.60 47.53L415.88 45.80Q409.06 44.27 404.68 41.74Q400.30 39.20 398.18 35.51Q396.06 31.81 396.06 26.82L396.06 26.76Q396.10 21.16 399.19 16.88Q402.28 12.59 407.69 10.14Q413.10 7.70 420.05 7.70Q426.86 7.70 432.19 10.15Q437.52 12.60 440.71 16.98Q443.90 21.37 444.32 27.16L444.37 27.85L437.74 27.85L437.65 27.20Q437.15 23.05 434.82 20.07Q432.49 17.09 428.69 15.46Q424.89 13.83 419.89 13.83Q414.81 13.83 410.97 15.44Q407.12 17.05 404.98 19.91Q402.83 22.77 402.83 26.59L402.83 26.66Q402.83 29.94 404.40 32.41Q405.98 34.89 409.25 36.62Q412.53 38.35 417.65 39.51L425.37 41.23Q432.58 42.83 437.04 45.35Q441.50 47.87 443.57 51.57Q445.64 55.27 445.64 60.47L445.64 60.52Q445.64 66.56 442.54 71.02Q439.44 75.49 433.75 77.93Q428.06 80.38 420.32 80.38ZM227.54 19.76Q228.70 19.76 231.49 20.13Q234.28 20.50 237.63 22.21Q240.98 23.92 243.71 27.88Q243.56 28.03 242.19 29.01Q240.82 29.98 239.13 31.86Q237.44 33.73 236.18 36.60Q234.91 39.47 234.91 43.42Q234.91 47.95 236.52 51.12Q238.13 54.28 240.26 56.20Q242.40 58.12 244.06 59.02Q245.72 59.92 245.82 59.97Q245.77 60.18 244.48 63.71Q243.19 67.24 240.24 71.56Q237.66 75.30 234.68 78.47Q231.70 81.63 227.54 81.63Q224.74 81.63 222.95 80.81Q221.16 79.99 219.26 79.18Q217.37 78.36 214.15 78.36Q211.04 78.36 208.96 79.20Q206.88 80.05 205.01 80.89Q203.14 81.73 200.61 81.73Q196.76 81.73 193.86 78.68Q190.97 75.62 187.91 71.35Q184.38 66.29 181.88 58.99Q179.37 51.70 179.37 44.27Q179.37 36.31 182.38 30.91Q185.38 25.51 190.10 22.74Q194.81 19.97 199.87 19.97Q202.56 19.97 204.93 20.84Q207.30 21.71 209.38 22.61Q211.46 23.50 213.15 23.50Q214.78 23.50 216.95 22.55Q219.11 21.61 221.79 20.68Q224.48 19.76 227.54 19.76ZM224.64 13.07Q222.58 15.55 219.47 17.21Q216.37 18.87 213.57 18.87Q212.99 18.87 212.47 18.76Q212.41 18.60 212.36 18.18Q212.31 17.76 212.31 17.28Q212.31 14.12 213.68 11.15Q215.05 8.17 216.79 6.22Q219.00 3.58 222.37 1.84Q225.75 0.11 228.80 0.00Q228.96 0.68 228.96 1.63Q228.96 4.80 227.75 7.77Q226.54 10.75 224.64 13.07Z"/></svg>`;
-export function loginScreen(onDone) {
-  const root = $("#app");
-  root.innerHTML = `<div class="gate">${LOGO}<div class="sub">Sistema da loja</div>
-    <form class="form" id="f" autocomplete="on">
-      <label class="field"><span>E-mail da conta da loja</span><input class="input" id="em" type="email" inputmode="email" autocomplete="username" autocapitalize="off" required></label>
-      <label class="field"><span>Senha</span><input class="input" id="pw" type="password" autocomplete="current-password" required></label>
-      <button class="btn metal" id="go">Entrar</button>
-      <p class="sub small center" style="margin:0">Só uma vez neste celular. Depois é só o seu PIN.</p>
-    </form></div>`;
-  $("#f", root).onsubmit = async e => {
-    e.preventDefault(); const b = $("#go", root); b.disabled = true; b.innerHTML = `<span class="spinner"></span>`;
-    try { await login($("#em", root).value.trim(), $("#pw", root).value); onDone(); }
-    catch (err) { toast(/invalid/i.test(err.message) ? "E-mail ou senha incorretos" : err.message, true); b.disabled = false; b.textContent = "Entrar"; }
-  };
-}
 export function profileScreen(onPick) {
   const root = $("#app");
   root.innerHTML = `<div class="gate">${LOGO}<div class="sub">Quem está usando?</div>
     <div class="avatars">${ACCOUNTS.map(a => `<button class="avatar" data-a="${a.id}">${avatar(a.id, "ph")}<span>${esc(profile(a.id).name)}</span><small>${esc(a.role)}</small></button>`).join("")}</div></div>`;
   $(".avatars", root).onclick = e => { const b = e.target.closest("[data-a]"); if (b) onPick(ACCOUNTS.find(a => a.id === b.dataset.a)); };
 }
-export function pinScreen(acct, onOK, onBack) {
-  const root = $("#app"); let pin = "";
+// check: confere o PIN (padrão: com o banco já carregado; na entrada, no servidor). Erro vira aviso na tela.
+export function pinScreen(acct, onOK, onBack, check = checkPIN) {
+  const root = $("#app"); let pin = "", busy = false;
   root.innerHTML = `<div class="gate"><div class="avatar">${avatar(acct.id, "ph")}</div><div style="font-size:20px;font-weight:600;margin-top:12px">${esc(profile(acct.id).name)}</div><div class="sub">Digite seu PIN</div>
     <div class="dots" id="dots">${"<i></i>".repeat(4)}</div>
     <div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="key" data-k="${n}">${n}</button>`).join("")}<button class="key txt" data-k="back">Voltar</button><button class="key" data-k="0">0</button><button class="key txt" data-k="del">Apagar</button></div></div>`;
   const dots = () => $$("#dots i", root).forEach((d, i) => d.classList.toggle("on", i < pin.length));
   root.querySelector(".keypad").onclick = async e => {
     const k = e.target.closest("[data-k]")?.dataset.k; if (!k) return;
+    if (busy) return;
     if (k === "back") return onBack();
     if (k === "del") { pin = pin.slice(0, -1); return dots(); }
     if (pin.length >= 4) return;
     pin += k; dots();
     if (pin.length === 4) {
-      if (await checkPIN(acct.id, pin)) onOK();
-      else { const d = $("#dots", root); d.classList.add("shake"); navigator.vibrate?.(80); setTimeout(() => { d.classList.remove("shake"); pin = ""; dots(); }, 450); }
+      busy = true;
+      let ok = false;
+      try { ok = await check(acct.id, pin); } catch (err) { toast(err.message, true); }
+      if (ok) return onOK();
+      const d = $("#dots", root); d.classList.add("shake"); navigator.vibrate?.(80); setTimeout(() => { d.classList.remove("shake"); pin = ""; busy = false; dots(); }, 450);
     }
   };
 }

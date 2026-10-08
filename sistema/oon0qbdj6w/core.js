@@ -28,15 +28,17 @@ const store = {
   set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
 
-// ——— login (conta da loja, uma vez por celular) ———
-export async function login(email, password) {
-  if (DEMO) { S.session = { email, access_token: "demo", expires_at: Date.now() + 1e9 }; store.set("imprts.web.session", S.session); return; }
-  const r = await fetch(`${CLOUD.url}/auth/v1/token?grant_type=password`, {
-    method: "POST", headers: { apikey: CLOUD.key, "Content-Type": "application/json" }, body: JSON.stringify({ email, password }),
-  });
+// ——— entrada: perfil + PIN, conferido no servidor (api/sistema-entrar.js), que devolve a sessão da conta da loja ———
+// Devolve true se entrou, false se o PIN está errado; outros casos viram erro com a mensagem para a tela.
+export async function entrar(conta, pin) {
+  if (DEMO) { S.session = { email: "demo@imprts", access_token: "demo", expires_at: Date.now() + 1e9 }; store.set("imprts.web.session", S.session); return true; }
+  const r = await fetch("/api/sistema-entrar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ conta, pin }) });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.error_description || j.msg || "Não foi possível entrar");
-  saveSession(j);
+  if (r.ok) { saveSession(j); return true; }
+  if (j.erro === "pin") return false;
+  if (j.erro === "bloqueado") { const m = Math.ceil(j.segundos / 60); throw new Error(`Muitos PINs errados. Tente de novo em ${m >= 60 ? Math.ceil(m / 60) + " h" : m + " min"}.`); }
+  if (j.erro === "sem-pin") throw new Error("Este perfil não tem PIN. Crie um PIN no Mac primeiro.");
+  throw new Error(j.msg || "Não foi possível entrar agora");
 }
 function saveSession(j) {
   S.session = { email: j.user?.email || S.session?.email, access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + (j.expires_in || 3600) * 1000 };

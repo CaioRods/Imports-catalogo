@@ -1,5 +1,5 @@
 // IMPRTS web — peças de interface reaproveitadas pelas telas.
-import { S } from "./core.js?v=1791417342";
+import { S } from "./core.js?v=1791454889";
 
 export const $ = (s, el = document) => el.querySelector(s);
 export const $$ = (s, el = document) => [...el.querySelectorAll(s)];
