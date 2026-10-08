@@ -29,7 +29,9 @@ module.exports = async function handler(req, res) {
   const conta = String(body?.conta || ""), pin = String(body?.pin || "");
   if (!CONTAS.includes(conta) || !/^\d{4}$/.test(pin)) return reply(res, 400, { erro: "dados" });
 
-  const email = process.env.IMPRTS_EMAIL, senha = process.env.IMPRTS_SENHA;
+  // tira espaço e aspas que às vezes vão junto ao colar na Vercel
+  const limpa = v => String(v || "").trim().replace(/^["']|["']$/g, "");
+  const email = limpa(process.env.IMPRTS_EMAIL), senha = limpa(process.env.IMPRTS_SENHA);
   if (!email || !senha) return reply(res, 500, { erro: "config", msg: "Servidor sem a conta da loja configurada" });
 
   try {
@@ -37,7 +39,7 @@ module.exports = async function handler(req, res) {
       method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ email, password: senha }),
     });
     const s = await r.json().catch(() => ({}));
-    if (!r.ok) { console.error("login da loja falhou", r.status, s); return reply(res, 500, { erro: "config", msg: "A conta da loja no servidor não entrou" }); }
+    if (!r.ok) { console.error("login da loja falhou", r.status, s); return reply(res, 500, { erro: "config", msg: "A conta da loja no servidor não entrou", motivo: s.error_code || s.error || r.status }); }
 
     const espera = await rpc(s.access_token, "pin_reservar", { p_conta: conta });
     if (espera > 0) return reply(res, 429, { erro: "bloqueado", segundos: espera });
