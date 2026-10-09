@@ -1,9 +1,9 @@
 // IMPRTS web — entrada, navegação e barra de abas.
-import { S, ACCOUNTS, DEMO, restoreSession, entrar, loadProfiles, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791462120";
-import { $, icon, route, go, toast, watchScroll } from "./ui.js?v=1791462120";
-import * as E from "./telas-estoque.js?v=1791462120";
-import * as V from "./telas-servicos.js?v=1791462120";
-import * as M from "./telas-mais.js?v=1791462120";
+import { S, ACCOUNTS, DEMO, restoreSession, entrar, loadProfiles, loadCatalog, sync, startSync, onChange, logout, pinOf } from "./core.js?v=1791577399";
+import { $, icon, route, go, toast, watchScroll, avatar } from "./ui.js?v=1791577399";
+import * as E from "./telas-estoque.js?v=1791577399";
+import * as V from "./telas-servicos.js?v=1791577399";
+import * as M from "./telas-mais.js?v=1791577399";
 
 const KEEP_PIN_HOURS = 8;
 const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
@@ -18,10 +18,10 @@ const SCREENS = {
   etiquetas: [E.etiquetas, E.etiquetasBind, true, "mais"],
   servicos: [V.servicos, V.servicosBind, true, "servicos"],
   os: [V.os, V.osBind, false, "servicos"],
-  orcamento: [V.orcamento, V.orcamentoBind, false, "orcamento"],
-  valores: [V.valores, V.valoresBind, false, "mais"],
-  vendas: [M.vendas, M.vendasBind, true, "mais"],
-  clientes: [M.clientes, M.clientesBind, false, "mais"],
+  orcamento: [V.orcamento, (r, a, re) => V.orcamentoBind(r, re), false, "orcamento"],
+  valores: [V.valores, (r, a, re) => V.valoresBind(r, re), false, "mais"],
+  vendas: [M.vendas, (r, a, re) => M.vendasBind(r, re), true, "mais"],
+  clientes: [M.clientes, (r, a, re) => M.clientesBind(r, re), false, "mais"],
   ajustes: [M.ajustes, (r, a, re) => M.ajustesBind(r, re, chooseProfile), false, "ajustes"],
   mais: [M.mais, null, false, "mais"],
 };
@@ -41,6 +41,15 @@ function tabbar(active) {
 }
 
 let current = { page: null, arg: null }, lastPage = null;
+// transição ao trocar de tela (sem arrastar): detalhe entra pela direita, voltar entra pela esquerda, abas sobem
+const DEPTH = { produto: 1, editar: 2, os: 1, etiquetas: 1, valores: 1, vendas: 1, clientes: 1, ajustes: 1 };
+function animate(screen, page) {
+  if (!screen || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const from = DEPTH[lastPage] || 0, to = DEPTH[page] || 0;
+  const cls = lastPage == null ? "anim-in" : to > from ? "anim-fwd" : to < from ? "anim-back" : "anim-tab";
+  screen.classList.add(cls);
+  screen.addEventListener("animationend", () => screen.classList.remove(cls), { once: true });
+}
 function render(fromData = false) {
   if (!S.user) return;
   let { page, arg } = route();
@@ -59,6 +68,7 @@ function render(fromData = false) {
   const app = $("#app");
   app.innerHTML = draw(arg) + tabbar(tab);
   const screen = app.firstElementChild;
+  if (!fromData && !sameScreen) animate(screen, page);
   const rerender = () => render(false);
   bind && bind(screen, arg, rerender);
   if (fromData || sameScreen) scrollTo(0, y); else scrollTo(0, 0);
@@ -88,11 +98,18 @@ function firstEntry() {
   }, firstEntry, entrar));
   // mostra na hora (com o que já estava guardado) e de novo quando as fotos chegam
   pick();
-  loadProfiles().then(() => { if (!S.user && !S.session && $(".avatars")) pick(); });
+  loadProfiles().then(() => {
+    if (S.user || S.session) return;
+    // troca só as fotos (sem redesenhar a tela, para a animação de entrada não repetir)
+    document.querySelectorAll(".avatars [data-a]").forEach(b => {
+      const ph = b.querySelector(".ph"), html = avatar(b.dataset.a, "ph");
+      if (ph && ph.outerHTML !== html) { ph.outerHTML = html; b.querySelector(".ph").classList.add("chegou"); }
+    });
+  });
 }
 
 async function afterLogin() {
-  $("#app").innerHTML = `<div class="gate"><div class="spinner"></div><div class="sub mt">Carregando o estoque…</div></div>`;
+  $("#app").innerHTML = `<div class="gate entrando">${M.LOGO}<div class="loadbar"><i></i></div><div class="sub">Carregando o estoque…</div></div>`;
   try { await sync(true); }
   catch (e) {
     if (e.auth || e.status === 401) { logout(); return firstEntry(); }
@@ -104,6 +121,9 @@ async function afterLogin() {
   if (acct && Date.now() - saved.at < KEEP_PIN_HOURS * 36e5) return enter(acct);
   chooseProfile();
 }
+
+// fundo animado para quando o app não está na tela
+document.addEventListener("visibilitychange", () => document.documentElement.classList.toggle("paused", document.hidden));
 
 async function boot() {
   if ("serviceWorker" in navigator && !DEMO) navigator.serviceWorker.register("sw.js").catch(() => {});

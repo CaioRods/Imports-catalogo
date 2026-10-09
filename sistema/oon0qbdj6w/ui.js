@@ -1,5 +1,5 @@
 // IMPRTS web — peças de interface reaproveitadas pelas telas.
-import { S, photoURL } from "./core.js?v=1791462120";
+import { S, photoURL } from "./core.js?v=1791577399";
 
 export const $ = (s, el = document) => el.querySelector(s);
 export const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -169,7 +169,9 @@ export function partName(id) { return S.catalog?.partById[id]?.name || id; }
 // ——— perfis ———
 export function profile(acct) {
   const a = (S.kv["profile." + acct] || {});
-  return { name: a.name || ({ rafael: "Rafael", funcionario: "Funcionário", caleb: "Caleb" }[acct] || acct), photo: a.photo ? `data:image/jpeg;base64,${a.photo}` : null, ...a };
+  // os campos do banco vêm primeiro: nome e foto vazios (null) não podem apagar o padrão
+  const photo = !a.photo ? null : /^(data:|https?:)/.test(a.photo) ? a.photo : `data:image/jpeg;base64,${a.photo}`;
+  return { ...a, name: a.name || ({ rafael: "Rafael", funcionario: "Funcionário", caleb: "Caleb" }[acct] || acct), photo };
 }
 export function avatar(acct, cls = "mini-av") {
   const p = profile(acct);

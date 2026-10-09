@@ -1,7 +1,7 @@
 /* IMPRTS web — mesmo visual do sistema do Mac (preto fosco, branco e metal), feito para o celular. */
 :root {
   color-scheme: dark;
-  --bg: #000;
+  --bg: #0b0b0d;
   --panel: #0e0e10;
   --card: #141416;
   --card-2: #1b1b1e;
@@ -24,7 +24,7 @@
   --r: 16px;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.4 var(--font); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { margin: 0; background: transparent; color: var(--text); font: 15px/1.4 var(--font); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body { min-height: 100dvh; overflow-x: hidden; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; border: 0; background: none; padding: 0; }
@@ -266,3 +266,98 @@ select.input { background-image: linear-gradient(45deg, transparent 50%, var(--d
 .thumb.noimg > img, .hero-img.noimg > img { display: none; }
 .thumb.noimg > svg { display: block; }
 .hero-img.noimg > svg { display: block; width: 64px; height: 64px; color: var(--faint); }
+
+/* ——— fundo: preto com cinza esfumaçado, mexendo devagar (só transform: leve para o celular) ——— */
+html { background: var(--bg); }
+#fundo { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+  background: radial-gradient(140% 80% at 50% -10%, #232327 0%, #121214 45%, #09090a 100%); }
+#fundo i { position: absolute; width: 95vmax; height: 95vmax; border-radius: 50%; will-change: transform;
+  background: radial-gradient(closest-side, rgba(160,160,172,.15), rgba(140,140,152,.06) 50%, transparent 74%);
+  animation: fumo 40s ease-in-out infinite alternate; }
+#fundo i:nth-child(1) { left: -45vmax; top: -30vmax; }
+#fundo i:nth-child(2) { right: -50vmax; top: 10vmax; animation-duration: 52s; animation-delay: -18s;
+  background: radial-gradient(closest-side, rgba(120,122,138,.13), rgba(110,112,125,.05) 50%, transparent 74%); }
+#fundo i:nth-child(3) { left: -20vmax; bottom: -55vmax; animation-duration: 64s; animation-delay: -30s;
+  background: radial-gradient(closest-side, rgba(205,205,215,.08), transparent 70%); }
+@keyframes fumo {
+  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate3d(18vmax, 12vmax, 0) scale(1.18) rotate(20deg); }
+  100% { transform: translate3d(-8vmax, 26vmax, 0) scale(.92) rotate(-12deg); }
+}
+.paused #fundo i { animation-play-state: paused; }
+
+/* ——— troca de tela (sem arrastar) ——— */
+.screen.anim-fwd { animation: entraDir .34s cubic-bezier(.2, .8, .2, 1) both; }
+.screen.anim-back { animation: entraEsq .34s cubic-bezier(.2, .8, .2, 1) both; }
+.screen.anim-tab { animation: entraAba .3s cubic-bezier(.2, .8, .2, 1) both; }
+.screen.anim-in { animation: entraApp .55s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes entraDir { from { opacity: 0; transform: translate3d(32px, 0, 0); } }
+@keyframes entraEsq { from { opacity: 0; transform: translate3d(-32px, 0, 0); } }
+@keyframes entraAba { from { opacity: 0; transform: translate3d(0, 12px, 0); } }
+@keyframes entraApp { from { opacity: 0; transform: scale(.96); } }
+
+/* ——— entrada: logo, perfis, PIN ——— */
+.gate > * { animation: sobe .5s cubic-bezier(.2, .8, .2, 1) both; }
+.gate > :nth-child(2) { animation-delay: .06s; } .gate > :nth-child(3) { animation-delay: .12s; }
+.gate > :nth-child(4) { animation-delay: .18s; } .gate > :nth-child(5) { animation-delay: .24s; }
+.gate > .logo { animation: logoEntra .8s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes sobe { from { opacity: 0; transform: translate3d(0, 14px, 0); } }
+@keyframes logoEntra { from { opacity: 0; transform: scale(.92); letter-spacing: .2em; } }
+.avatars .avatar { animation: surge .55s cubic-bezier(.2, 1.4, .4, 1) both; }
+.avatars .avatar:nth-child(1) { animation-delay: .25s; } .avatars .avatar:nth-child(2) { animation-delay: .33s; } .avatars .avatar:nth-child(3) { animation-delay: .41s; }
+@keyframes surge { from { opacity: 0; transform: scale(.6) translate3d(0, 12px, 0); } }
+.avatar .ph { transition: transform .18s, box-shadow .18s; }
+.avatar:active .ph { transform: scale(.92); box-shadow: 0 0 0 4px rgba(255,255,255,.12); }
+.gate.pin .keypad .key { animation: surge .45s cubic-bezier(.2, 1.3, .4, 1) both; animation-delay: calc(.2s + var(--k, 0) * 25ms); }
+.key { transition: background .12s, transform .12s; }
+.key:active { transform: scale(.93); }
+.dots i { transition: background .15s, border-color .15s, transform .2s; }
+.dots i.on { animation: ponto .25s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes ponto { 50% { transform: scale(1.35); } }
+.dots.ok i { background: var(--green); border-color: var(--green); box-shadow: 0 0 12px rgba(52,199,123,.6); transform: scale(1.15); }
+.gate.saindo { animation: sai .26s ease-in both; }
+@keyframes sai { to { opacity: 0; transform: scale(1.05); } }
+/* "entrando": logo respira e uma barra corre */
+.gate.entrando .logo { animation: respira 1.8s ease-in-out infinite; }
+@keyframes respira { 50% { opacity: .55; transform: scale(.98); } }
+.loadbar { width: 160px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; margin: 22px 0 14px; }
+.loadbar i { display: block; width: 40%; height: 100%; border-radius: 3px; background: var(--metal); animation: corre 1.1s cubic-bezier(.6, 0, .4, 1) infinite; }
+@keyframes corre { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  #fundo i, .gate > *, .avatars .avatar, .gate.pin .keypad .key, .screen[class*="anim-"] { animation: none !important; }
+}
+
+/* ——— cadastro: escolher o modelo pela foto ——— */
+.pick-title { font-size: 24px; font-weight: 600; letter-spacing: -.01em; margin: 4px 2px -6px; }
+.picker .search { margin: 14px 0 0; }
+.picker .section-title { margin: 18px 4px 10px; }
+.models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.mcard { display: grid; justify-items: center; align-content: start; gap: 8px; padding: 12px 6px 10px; border-radius: 16px;
+  background: rgba(255,255,255,.045); border: 1px solid var(--hair); color: var(--text); text-align: center;
+  animation: surge .45s cubic-bezier(.2, 1.3, .4, 1) both; animation-delay: calc(var(--i, 0) * 30ms); transition: transform .15s, background .15s; }
+.mcard:active { transform: scale(.95); background: rgba(255,255,255,.09); }
+.mcard.on { border-color: rgba(255,255,255,.5); }
+.mimg { width: 100%; aspect-ratio: 1; display: grid; place-items: center; }
+.mimg img { width: 100%; height: 100%; object-fit: contain; }
+.mname { font-size: 12.5px; line-height: 1.25; font-weight: 500; }
+.hero-dev { display: flex; align-items: center; gap: 16px; padding: 14px; border-radius: 20px;
+  background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); border: 1px solid var(--hair); animation: sobe .4s both; }
+.hero-img { width: 112px; height: 112px; flex: none; display: grid; place-items: center; }
+.hero-img img { width: 100%; height: 100%; object-fit: contain; animation: surge .5s cubic-bezier(.2, 1.3, .4, 1) both; }
+.hero-info { display: grid; gap: 6px; min-width: 0; justify-items: start; }
+.hero-name { font-size: 19px; font-weight: 600; line-height: 1.2; }
+.hero-info .btn.small { margin-top: 4px; height: 34px; font-size: 13px; padding: 0 12px; }
+.form .section-title { margin: 10px 2px -6px; }
+.batt-pick { display: flex; align-items: center; gap: 12px; --c: var(--text); }
+.batt-pick.good { --c: var(--green); } .batt-pick.ok { --c: var(--amber); } .batt-pick.low { --c: var(--red); }
+.batt-pick input[type=range] { flex: 1; accent-color: var(--c); height: 28px; }
+.batt-pick input[type=range].unset { opacity: .35; }
+.batt-num { position: relative; width: 84px; flex: none; }
+.batt-num .input { padding-right: 28px; text-align: right; color: var(--c); font-weight: 600; }
+.batt-num span { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--dim); pointer-events: none; }
+.field .hint.ok { color: var(--green); }
+.save-bar { position: sticky; bottom: calc(var(--tabbar) + var(--bottom) + 10px); z-index: 5; }
+.save-bar .btn { box-shadow: 0 10px 30px rgba(0,0,0,.55), inset 0 1px 0 #fff; }
+.avatar .ph.chegou { animation: fotoChega .45s ease-out both; }
+@keyframes fotoChega { from { opacity: .2; filter: blur(4px); } }

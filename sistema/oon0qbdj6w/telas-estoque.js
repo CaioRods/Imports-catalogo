@@ -1,8 +1,8 @@
 // IMPRTS web — Início, Estoque, produto, cadastro, venda e etiquetas.
-import { S, createProduct, updateProduct, uploadPhoto, removePhoto, photoURL, logActivity, setKV } from "./core.js?v=1791462120";
+import { S, createProduct, updateProduct, uploadPhoto, removePhoto, photoURL, logActivity, setKV } from "./core.js?v=1791577399";
 import { $, $$, esc, money, code, icon, toast, sheet, confirmSheet, go, topbar, thumb, battery, priceHTML, promoOn, statusPill,
   model, colorOf, coverURL, autoName, applicableParts, partName, chips, bindChips, parseMoney, moneyInput, fmtDate, fmtDateTime, ago,
-  avatar, profile, phoneMask, digits, waLink, luhnOK, catIcon } from "./ui.js?v=1791462120";
+  avatar, profile, phoneMask, digits, waLink, luhnOK, catIcon } from "./ui.js?v=1791577399";
 
 const norm = s => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 const alive = () => S.products.filter(p => !p.deleted);
@@ -217,38 +217,65 @@ export function editor(id) {
   const d = draft, cat = S.catalog;
   const models = cat.models.filter(m => m.category === d.category);
   const m = model(d.model_id);
+  const head = topbar({ title: editing ? `Editar ${code(editing.code)}` : "Cadastrar", back: editing ? `#/produto/${editing.id}` : "#/estoque" });
+  const catField = `<div class="field"><span>O que vai cadastrar?</span>${chips("cat", cat.categories.filter(c => c.id !== "android" || d.category === "android"), d.category, { wrap: false })}</div>`;
+  // 1º passo: escolher o modelo pela foto (com busca), em vez de uma lista comprida
+  if (models.length && (!m || d._picking)) {
+    const title = (cat.categories.find(c => c.id === d.category) || {}).title || "aparelho";
+    return `<div class="screen">${head}<div class="form mt">${catField}
+      <div class="picker"><div class="pick-title">Qual ${esc(title)}?</div>
+        <label class="search">${icon("search")}<input id="mq" type="search" placeholder="Buscar (ex.: 13 pro max)" autocomplete="off" enterkeyhint="search"></label>
+        ${groupModels(models).map(([g, list]) => `<div class="pick-group"><div class="section-title">${esc(g)}</div><div class="models">${list.map((x, i) => `<button type="button" class="mcard ${x.id === d.model_id ? "on" : ""}" data-m="${x.id}" data-q="${esc(normQ(x.name))}" style="--i:${i}"><span class="mimg">${x.colors[0] ? `<img loading="lazy" alt="" src="/img/modelos/${x.id}/${x.colors[0].id}.webp?v=3" onerror="this.remove()">` : ""}</span><span class="mname">${esc(x.name)}</span></button>`).join("")}</div></div>`).join("")}
+        <p class="sub small center hide" id="mnone">Nenhum modelo com esse nome.</p>
+        ${m ? `<button type="button" class="btn ghost" id="pickCancel">Manter ${esc(m.name)}</button>` : ""}
+      </div></div></div>`;
+  }
   const storages = m ? m.storages : cat.genericStorages;
   const parts = applicableParts(d.category, m);
   const imei = d.serial ? luhnOK(d.serial) : null;
-  return `<div class="screen">${topbar({ title: editing ? `Editar ${code(editing.code)}` : "Cadastrar", back: editing ? `#/produto/${editing.id}` : "#/estoque" })}
+  const color = m?.colors.find(c => c.id === d.color_id);
+  const cover = coverURL(d);
+  const bh = d.battery_health;
+  const battCls = bh == null ? "" : bh >= 85 ? "good" : bh >= 80 ? "ok" : "low";
+  return `<div class="screen">${head}
     <div class="form mt">
-      <div class="field"><span>Categoria</span>${chips("cat", cat.categories.filter(c => c.id !== "android" || d.category === "android"), d.category, { wrap: false })}</div>
-      ${models.length ? `<label class="field"><span>Modelo</span><select class="input" id="model"><option value="">Escolher…</option>${groupModels(models).map(([g, list]) => `<optgroup label="${esc(g)}">${list.map(x => `<option value="${x.id}" ${x.id === d.model_id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</optgroup>`).join("")}</select></label>` : ""}
-      ${m && m.colors.length ? `<div class="field"><span>Cor${d.color_id ? ` · <b style="color:var(--text);font-weight:500">${esc((m.colors.find(c => c.id === d.color_id) || {}).name || "")}</b>` : ""}</span><div class="swatches" id="colors">${m.colors.map(c => `<button type="button" class="sw ${c.id === d.color_id ? "on" : ""}" data-v="${c.id}" aria-label="${esc(c.name)}"><i style="background:${c.hex}"></i></button>`).join("")}</div></div>` : ""}
+      ${m ? `<div class="hero-dev">
+        <div class="hero-img">${cover ? `<img src="${esc(cover)}" alt="" onerror="this.remove()">` : ""}</div>
+        <div class="hero-info"><div class="hero-name">${esc(m.name)}</div>
+          <div class="sub small">${[color?.name, d.storage].filter(Boolean).map(esc).join(" · ") || "Escolha a cor e a capacidade"}</div>
+          <button type="button" class="btn small ghost" id="swapModel">${icon("edit", "sm")}Trocar modelo</button></div>
+      </div>` : catField}
+      <div class="section-title">Aparelho</div>
+      ${m && m.colors.length ? `<div class="field"><span>Cor${color ? ` · <b style="color:var(--text);font-weight:500">${esc(color.name)}</b>` : ""}</span><div class="swatches" id="colors">${m.colors.map(c => `<button type="button" class="sw ${c.id === d.color_id ? "on" : ""}" data-v="${c.id}" aria-label="${esc(c.name)}"><i style="background:${c.hex}"></i></button>`).join("")}</div></div>` : ""}
       ${m && m.chips ? `<div class="field"><span>Chip</span>${chips("chip", m.chips.map(x => ({ id: x, title: x })), d.chip)}</div><div class="field"><span>Memória</span>${chips("ram", m.rams.map(x => ({ id: x, title: x })), d.ram)}</div>` : ""}
-      <div class="field"><span>Armazenamento</span>${chips("sto", storages.map(x => ({ id: x, title: x })), d.storage)}</div>
+      <div class="field"><span>Capacidade</span>${chips("sto", storages.map(x => ({ id: x, title: x })), d.storage)}</div>
+      <label class="field"><span>IMEI ou número de série</span><input class="input" id="serial" value="${esc(d.serial || "")}" autocapitalize="characters" autocomplete="off" placeholder="Disque *#06# no aparelho"><span class="hint ${imei === false ? "err" : ""}" id="imeiHint">${imei === false ? "IMEI inválido — confira os dígitos" : imei ? "IMEI confere ✓" : ""}</span></label>
+      <div class="section-title">Estado</div>
       <div class="field"><span>Condição</span>${chips("cond", cat.conditions, d.condition)}</div>
-      <div class="grid2">
-        <label class="field"><span>Bateria (%)</span><input class="input" id="batt" inputmode="numeric" maxlength="3" value="${d.battery_health ?? ""}" placeholder="—"></label>
-        <label class="field"><span>IMEI / série</span><input class="input" id="serial" value="${esc(d.serial || "")}" autocapitalize="characters" autocomplete="off"><span class="hint ${imei === false ? "err" : ""}" id="imeiHint">${imei === false ? "IMEI inválido — confira os dígitos" : ""}</span></label>
-      </div>
-      <div class="field"><span>Peças <span style="color:var(--faint)">· toque para alternar: trocada → com defeito → original</span></span>
+      <div class="field"><span>Saúde da bateria</span>
+        <div class="batt-pick ${battCls}" id="battBox"><input type="range" id="battR" min="50" max="100" step="1" value="${bh ?? 100}" class="${bh == null ? "unset" : ""}">
+          <label class="batt-num"><input class="input" id="batt" inputmode="numeric" maxlength="3" value="${bh ?? ""}" placeholder="—"><span>%</span></label></div>
+        <span class="hint" id="battHint">${bh == null ? "Arraste ou digite (Ajustes → Bateria → Saúde)" : bh < 80 ? "Abaixo de 80%: o iPhone mostra “Manutenção”" : ""}</span></div>
+      <div class="field"><span>Peças <span style="color:var(--faint)">· toque: trocada → com defeito → original</span></span>
         <div class="parts" id="parts">${parts.map(id => partBtn(id, d.parts[id])).join("")}</div></div>
+      <div class="section-title">Preço</div>
       <div class="grid2">
-        <label class="field"><span>Preço de venda</span><div class="money"><input class="input" id="price" inputmode="decimal" value="${moneyInput(d.price)}"></div></label>
+        <label class="field"><span>Venda</span><div class="money"><input class="input" id="price" inputmode="decimal" value="${moneyInput(d.price)}"></div></label>
         ${isOwner() ? `<label class="field"><span>Custo (só o dono vê)</span><div class="money"><input class="input" id="cost" inputmode="decimal" value="${moneyInput(d.cost)}"></div></label>` : "<div></div>"}
       </div>
       ${editing && editing.status !== "vendido" ? `<div class="field"><span>Situação</span>${chips("status", [{ id: "disponivel", title: "Disponível" }, { id: "reservado", title: "Reservado" }, { id: "reparo", title: "Em reparo" }], d.status)}</div>` : ""}
-      <label class="field"><span>Nome na etiqueta e no site</span><input class="input" id="name" value="${esc(d.name || autoName(d.category, m, m?.colors.find(c => c.id === d.color_id), d.storage))}"></label>
-      <label class="field"><span>Observações (só no sistema)</span><textarea class="input" id="notes" rows="3">${esc(d.notes || "")}</textarea></label>
+      <div class="section-title">Site e etiqueta</div>
+      <label class="field"><span>Nome</span><input class="input" id="name" value="${esc(d.name || autoName(d.category, m, color, d.storage))}"></label>
       <div class="toggle"><span>Mostrar no site</span><label class="switch"><input type="checkbox" id="pub" ${d.publish ? "checked" : ""}><span></span></label></div>
-      <label class="field"><span>Descrição para o cliente (site)</span><textarea class="input" id="desc" rows="3" placeholder="Ex.: muito conservado, sem marcas, acompanha cabo.">${esc(d.description || "")}</textarea></label>
+      <label class="field"><span>Descrição para o cliente</span><textarea class="input" id="desc" rows="3" placeholder="Ex.: muito conservado, sem marcas, acompanha cabo.">${esc(d.description || "")}</textarea></label>
       <div class="field"><span>Fotos (até 5 com a capa oficial, que é fixa)</span><div class="photos" id="photos">${photosHTML(d)}</div>
         <input type="file" id="file" accept="image/*" class="hide"></div>
-      <button class="btn metal" id="save">${icon("check", "sm")}${editing ? "Salvar alterações" : "Cadastrar produto"}</button>
+      <label class="field"><span>Observações (só no sistema)</span><textarea class="input" id="notes" rows="2">${esc(d.notes || "")}</textarea></label>
+      <div class="save-bar"><button class="btn metal" id="save">${icon("check", "sm")}${editing ? "Salvar alterações" : "Cadastrar produto"}</button></div>
       ${editing ? "" : `<p class="sub small center" style="margin:-6px 0 0">O código da etiqueta é gerado pelo sistema ao salvar.</p>`}
     </div></div>`;
 }
+const normQ = t => String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim();
 function groupModels(models) {
   const g = new Map();
   for (const m of [...models].sort((a, b) => b.year - a.year || a.name.localeCompare(b.name))) {
@@ -268,19 +295,58 @@ function photosHTML(d) {
 export function editorBind(root, id, rerender) {
   const d = draft;
   const keep = () => {   // guarda o que foi digitado antes de redesenhar
-    const v = s => $(s, root)?.value;
-    if ($("#batt", root)) d.battery_health = v("#batt") ? Math.min(100, parseInt(v("#batt"), 10)) || null : null;
-    d.serial = v("#serial") ?? d.serial; d.price = parseMoney(v("#price")); if ($("#cost", root)) d.cost = parseMoney(v("#cost"));
-    d.name = v("#name") ?? d.name; d.notes = v("#notes") ?? d.notes; d.description = v("#desc") ?? d.description; d.publish = $("#pub", root)?.checked ?? d.publish;
+    const has = s => !!$(s, root), v = s => $(s, root)?.value;
+    if (has("#batt")) d.battery_health = v("#batt") ? Math.min(100, parseInt(v("#batt"), 10)) || null : null;
+    if (has("#serial")) d.serial = v("#serial");
+    if (has("#price")) d.price = parseMoney(v("#price"));
+    if (has("#cost")) d.cost = parseMoney(v("#cost"));
+    if (has("#name")) d.name = v("#name");
+    if (has("#notes")) d.notes = v("#notes");
+    if (has("#desc")) d.description = v("#desc");
+    if (has("#pub")) d.publish = $("#pub", root).checked;
   };
   const renameAuto = () => { const m = model(d.model_id); d.name = autoName(d.category, m, m?.colors.find(c => c.id === d.color_id), d.storage); };
-  bindChips(root, "cat", v => { keep(); d.category = v; d.model_id = null; d.color_id = null; d.chip = null; d.ram = null; renameAuto(); rerender(); });
-  $("#model", root)?.addEventListener("change", e => { keep(); d.model_id = e.target.value || null; const m = model(d.model_id); d.color_id = m?.colors[0]?.id || null; if (m?.chips) { d.chip = m.chips[0]; d.ram = m.rams[0]; } if (m && d.storage && !m.storages.includes(d.storage)) d.storage = null; renameAuto(); rerender(); });
+  const pickModel = mid => {
+    keep(); d.model_id = mid || null; d._picking = false;
+    const m = model(d.model_id); d.color_id = m?.colors[0]?.id || null;
+    if (m?.chips) { d.chip = m.chips[0]; d.ram = m.rams[0]; }
+    if (m && d.storage && !m.storages.includes(d.storage)) d.storage = null;
+    if (m && !d.storage && m.storages.length === 1) d.storage = m.storages[0];
+    renameAuto(); rerender(); scrollTo(0, 0);
+  };
+  bindChips(root, "cat", v => { keep(); d.category = v; d.model_id = null; d.color_id = null; d.chip = null; d.ram = null; d._picking = false; renameAuto(); rerender(); });
+  // escolha do modelo
+  const picker = $(".picker", root);
+  if (picker) {
+    picker.addEventListener("click", e => { const b = e.target.closest(".mcard"); if (b) pickModel(b.dataset.m); });
+    $("#pickCancel", root) && ($("#pickCancel", root).onclick = () => { d._picking = false; rerender(); });
+    $("#mq", root).addEventListener("input", e => {
+      const words = normQ(e.target.value).replace(/^iphone ?/, "").split(" ").filter(Boolean);
+      let any = false;
+      $$(".pick-group", root).forEach(g => {
+        let n = 0;
+        $$(".mcard", g).forEach(c => { const ok = words.every(w => c.dataset.q.includes(w)); c.classList.toggle("hide", !ok); if (ok) n++; });
+        g.classList.toggle("hide", !n); if (n) any = true;
+      });
+      $("#mnone", root).classList.toggle("hide", any);
+    });
+    return;
+  }
+  $("#swapModel", root) && ($("#swapModel", root).onclick = () => { keep(); d._picking = true; rerender(); scrollTo(0, 0); });
   $("#colors", root)?.addEventListener("click", e => { const b = e.target.closest(".sw"); if (!b) return; keep(); d.color_id = b.dataset.v; renameAuto(); rerender(); });
+  // bateria: barra e número andam juntos
+  const battR = $("#battR", root), battI = $("#batt", root);
+  const battShow = v => {
+    const box = $("#battBox", root), h = $("#battHint", root);
+    box.className = "batt-pick " + (v == null ? "" : v >= 85 ? "good" : v >= 80 ? "ok" : "low");
+    h.textContent = v == null ? "Arraste ou digite (Ajustes → Bateria → Saúde)" : v < 80 ? "Abaixo de 80%: o iPhone mostra “Manutenção”" : "";
+  };
+  battR.addEventListener("input", () => { battR.classList.remove("unset"); battI.value = battR.value; battShow(+battR.value); });
+  battI.addEventListener("input", () => { const v = parseInt(battI.value, 10); if (v >= 1 && v <= 100) { battR.value = Math.max(50, v); battR.classList.remove("unset"); battShow(v); } else battShow(null); });
   bindChips(root, "chip", v => d.chip = v); bindChips(root, "ram", v => d.ram = v);
   bindChips(root, "sto", v => { keep(); d.storage = v; renameAuto(); $("#name", root).value = d.name; });
   bindChips(root, "cond", v => d.condition = v); bindChips(root, "status", v => d.status = v);
-  $("#serial", root).addEventListener("input", e => { const ok = luhnOK(e.target.value); const h = $("#imeiHint", root); h.textContent = ok === false ? "IMEI inválido — confira os dígitos" : ""; h.className = "hint" + (ok === false ? " err" : ""); });
+  $("#serial", root).addEventListener("input", e => { const ok = luhnOK(e.target.value); const h = $("#imeiHint", root); h.textContent = ok === false ? "IMEI inválido — confira os dígitos" : ok ? "IMEI confere ✓" : ""; h.className = "hint" + (ok === false ? " err" : ok ? " ok" : ""); });
   $("#parts", root).addEventListener("click", e => {
     const b = e.target.closest(".part"); if (!b) return;
     const k = b.dataset.p, cur = d.parts[k], next = !cur ? "trocada" : cur === "trocada" ? "defeito" : null;
