@@ -451,6 +451,9 @@ html.intro .intro-curtain { display: grid; place-items: center; position: fixed;
 .nav svg.logo-assist { height: 20px; }
 .hero-logo svg.logo-assist { height: clamp(96px, 26vw, 210px); }
 @media (max-width: 720px) { .hero-logo svg.logo-assist { height: 27vw; } }
+/* catálogo: mesmo tamanho das letras de antes, com "CATÁLOGO" embaixo (quadro 142 em vez de 93.73) */
+.hero-logo svg.logo-cat { height: clamp(85px, 22.7vw, 200px); }
+@media (max-width: 720px) { .hero-logo svg.logo-cat { height: 25.8vw; } }
 .sheet textarea { display: block; width: 100%; margin-top: 7px; padding: 13px 15px; font: 16px/1.4 var(--font); color: var(--text); background: rgba(255,255,255,.05);
   border: 1px solid var(--hair-strong); border-radius: 14px; outline: none; resize: vertical; min-height: 84px; transition: border-color .2s, background .2s; }
 .sheet textarea:focus { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.08); }
